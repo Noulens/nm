@@ -22,7 +22,7 @@ typedef struct s_file
 
 typedef struct s_args
 {
-	u_int16_t   flags;
+	u_int8_t   flags;
 	int         fds;
 	t_list      *fl;
 }   t_args;

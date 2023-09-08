@@ -17,5 +17,6 @@
 #include "struct.h"
 
 void    free_list(t_list **begin);
+void    proceed(t_args *args);
 
 #endif //FT_NM_H

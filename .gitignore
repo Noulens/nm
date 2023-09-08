@@ -4,3 +4,4 @@ build
 ft_nm
 b_ft_nm
 *.gch
+*.a

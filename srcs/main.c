@@ -39,9 +39,11 @@ static void    add_node(t_args *args, const char *path)
 	args->fds++;
 }
 
-void    check_args(int ac, char **av, t_args *args) {
+void    check_args(int ac, char **av, t_args *args)
+{
+	size_t  len = 0;
+
 	++av;
-	size_t len;
 	if (ac == 1)
 	{
 		args->fds = open("./a.out", O_RDONLY);
@@ -96,6 +98,7 @@ int main(int ac, char **av)
 	t_args  args = {0, 0, NULL};
 
 	check_args(ac, av, &args);
+	proceed(&args);
 	free_list(&args.fl);
 	return (0);
 }

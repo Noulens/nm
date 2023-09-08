@@ -17,12 +17,14 @@ SRCS_DIR	=	$(sort $(dir $(wildcard ./srcs/*/)))
 SRCS		=	$(addprefix srcs/,					\
 										main.c		\
 					$(addprefix files/,	free.c		\
+										proceed.c	\
 					)								\
 				)
 
 SRCS_B		=	$(addprefix srcs/,					\
                 						main.c		\
                 	$(addprefix files,	free.c		\
+										proceed.c	\
                 	)								\
                 )
 
