@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
+#include <elf.h>
 #include "libft.h"
 #include "struct.h"
 

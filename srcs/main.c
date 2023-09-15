@@ -46,11 +46,7 @@ void    check_args(int ac, char **av, t_args *args)
 	++av;
 	if (ac == 1)
 	{
-		args->fds = open("./a.out", O_RDONLY);
-		if (args->fds < 0) {
-			perror("ft_nm: 'a.out'");
-			exit(1);
-		}
+		add_node(args, "./a.out");
 		return ;
 	}
 	len = ft_ptrlen((const char **) av);
