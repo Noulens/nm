@@ -17,6 +17,10 @@
 #include "libft.h"
 #include "struct.h"
 
+#define IS_ELF "File is an ELF file\n"
+#define NOT_ELF "ft_nm: %s: file format not recognized\n"
+#define INVALID_OPT "nm: invalid option -- %c\n"
+
 void    free_list(t_list **begin);
 void    proceed(t_args *args);
 

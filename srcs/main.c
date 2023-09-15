@@ -75,7 +75,7 @@ void    check_args(int ac, char **av, t_args *args)
 						args->flags |= U;
 						break;
 					default:
-						ft_fprintf(2, "nm: invalid option -- %c", **av);
+						ft_fprintf(2, INVALID_OPT, **av);
 						exit(1);
 				}
 				++*av;
