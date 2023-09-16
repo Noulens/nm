@@ -17,9 +17,9 @@ static int  check_magic(int fd)
 
 	ptr = get_next_line(fd);
 	if (ft_strlen(ptr) >= 4 && ft_strncmp(ptr, ELFMAG, 4) == 0)
-		return (0);
+		return (free(ptr), 0);
 	else
-		return (-1);
+		return (free(ptr), -1);
 }
 
 static void mapping(const char *path, struct stat *sb, uint8_t *map)
