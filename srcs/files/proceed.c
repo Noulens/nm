@@ -6,9 +6,20 @@
 
 static void parseElfHeader (uint8_t *map)
 {
-	Elf64_Ehdr  *ehdr = (Elf64_Ehdr *)map;
+	Elf32_Ehdr  *ehdr = (Elf32_Ehdr *)map;
 
 	ft_fprintf (STDOUT_FILENO, "Entry point: %p\n", ehdr->e_entry);
+}
+
+static int  check_magic(int fd)
+{
+	char *ptr = NULL;
+
+	ptr = get_next_line(fd);
+	if (ft_strlen(ptr) >= 4 && ft_strncmp(ptr, ELFMAG, 4) == 0)
+		return (0);
+	else
+		return (-1);
 }
 
 static void mapping(const char *path, struct stat *sb, uint8_t *map)
@@ -19,6 +30,11 @@ static void mapping(const char *path, struct stat *sb, uint8_t *map)
 	if (fd == -1)
 	{
 		ft_fprintf(STDERR_FILENO, OPEN_ERR, path, strerror(errno));
+		return ;
+	}
+	if (check_magic(fd) == -1)
+	{
+		ft_fprintf(STDERR_FILENO, NOT_ELF, path);
 		return ;
 	}
 	if (fstat(fd, sb) == -1)
