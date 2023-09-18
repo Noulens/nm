@@ -37,11 +37,21 @@ typedef enum e_objs
 	o_un
 }   t_objs;
 
+typedef enum e_hdr
+{
+	LEND =      0b100000,
+	BEND =      0b1000000,
+	X86 =       0b10000000,
+	X86_64 =    0b100000000,
+	ERROR =     0b1000000000
+}   t_hdr;
+
 typedef struct s_file
 {
 	char    *path;
 	int     fd;
-	int     arch;
+	int     hdr_opt;
+	size_t  size;
 }   t_file;
 
 typedef struct s_args

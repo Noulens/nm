@@ -18,11 +18,9 @@
 #include "struct.h"
 
 #define IS_ELF "File is an ELF file\n"
-#define NOT_ELF "ft_nm: %s: file format not recognized\n"
-#define INVALID_OPT "nm: invalid option -- %c\n"
-#define OPEN_ERR "nm: '%s': %s\n"
-#define X86 32
-#define X86_64 64
+#define NOT_ELF "ft_nm: %s: file format not recognized"
+#define INVALID_OPT "ft_nm: invalid option -- %c\n"
+#define OPEN_ERR "ft_nm: '%s': %s\n"
 
 void    free_list(t_list **begin);
 void    proceed(t_args *args);

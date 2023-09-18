@@ -2,6 +2,9 @@
 // Created by tnoulens on 9/18/23.
 //
 
+/*
+ * this program changes a byte in a file at a given position
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>

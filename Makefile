@@ -91,7 +91,7 @@ endif
 
 ##.SILENT:
 
-all:			subsystem $(NAME)
+all:			change subsystem $(NAME)
 
 bonus:			subsystem $(NAME_B)
 
@@ -139,4 +139,4 @@ rebonus:		fclean
 				$(MAKE) -s bonus
 
 change:
-	 gcc -Wall -Wextra -Werror ./test/changedata.c -o change_byte
+	 			$(CC) $(CFLAGS) ./test/changedata.c -o change_byte
