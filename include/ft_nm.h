@@ -21,6 +21,8 @@
 #define NOT_ELF "ft_nm: %s: file format not recognized\n"
 #define INVALID_OPT "nm: invalid option -- %c\n"
 #define OPEN_ERR "nm: '%s': %s\n"
+#define X86 32
+#define X86_64 64
 
 void    free_list(t_list **begin);
 void    proceed(t_args *args);

@@ -25,7 +25,7 @@ static void    add_node(t_args *args, const char *path)
 		perror("ft_nm: add_node");
 		exit(1);
 	}
-	*file_to_add = (t_file){ptr, -1};
+	*file_to_add = (t_file){ptr, -1, 0};
 	temp = ft_lstnew((void *)file_to_add);
 	if (!temp)
 	{

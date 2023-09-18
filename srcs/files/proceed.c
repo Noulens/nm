@@ -4,11 +4,26 @@
 
 #include "ft_nm.h"
 
-static void parseElfHeader (uint8_t *map)
+static void parseElfHeader (t_file *file, uint8_t *map)
 {
-	Elf32_Ehdr  *ehdr = (Elf32_Ehdr *)map;
-
-	ft_fprintf (STDOUT_FILENO, "Entry point: %p\n", ehdr->e_entry);
+	Elf32_Ehdr  *ehdr32 = NULL;
+	Elf64_Ehdr  *ehdr64 = NULL;
+	if (file->arch == X86)
+	{
+		ehdr32 = (Elf32_Ehdr *)map;
+		for (int i = 0; i < 16; i++)
+		{
+			ft_fprintf(1, "%x ", ehdr32->e_ident[i]);
+		}
+	}
+	else
+	{
+		ehdr64 = (Elf64_Ehdr *)map;
+		for (int i = 0; i < 16; i++)
+		{
+			ft_fprintf(1, "%x ", ehdr64->e_ident[i]);
+		}
+	}
 }
 
 static int  check_magic(int fd)
@@ -16,25 +31,35 @@ static int  check_magic(int fd)
 	char *ptr = NULL;
 
 	ptr = get_next_line(fd);
-	if (ft_strlen(ptr) >= 4 && ft_strncmp(ptr, ELFMAG, 4) == 0)
-		return (free(ptr), 0);
-	else
-		return (free(ptr), -1);
+	if (ft_strlen(ptr) >= 16 && ft_strncmp(ptr, ELFMAG, 4) == 0)
+	{
+		switch (ptr[4])
+		{
+			case 1:
+				return (free(ptr), X86);
+			case 2:
+				return (free(ptr), X86_64);
+			default:
+				return (free(ptr), -1);
+		}
+	}
+	return (free(ptr), -1);
 }
 
-static void mapping(const char *path, struct stat *sb, uint8_t *map)
+static void mapping(t_file *file, struct stat *sb, uint8_t *map)
 {
 	int fd = -1;
 
-	fd = open(path, O_RDONLY);
+	fd = open(file->path, O_RDONLY);
 	if (fd == -1)
 	{
-		ft_fprintf(STDERR_FILENO, OPEN_ERR, path, strerror(errno));
+		ft_fprintf(STDERR_FILENO, OPEN_ERR, file->path, strerror(errno));
 		return ;
 	}
-	if (check_magic(fd) == -1)
+	file->arch = check_magic(fd);
+	if ( file->arch == -1)
 	{
-		ft_fprintf(STDERR_FILENO, NOT_ELF, path);
+		ft_fprintf(STDERR_FILENO, NOT_ELF, file->path);
 		return ;
 	}
 	if (fstat(fd, sb) == -1)
@@ -50,7 +75,7 @@ static void mapping(const char *path, struct stat *sb, uint8_t *map)
 	}
 	if (close(fd) == -1)
 		perror("nm: close fd mmap");
-	parseElfHeader(map);
+	parseElfHeader(file, map);
 	if (munmap(map, (*sb).st_size) < 0)
 	{
 		perror("nm: munmap");
@@ -70,7 +95,7 @@ void    proceed(t_args *args)
 		file = (t_file *)tmp->content;
 		if (args->fds > 1)
 			ft_printf("%s:\n", file->path);
-		mapping(file->path, &sb, map);
+		mapping(file, &sb, map);
 		ft_putchar_fd('\n', 1);
 		tmp = tmp->next;
 	}

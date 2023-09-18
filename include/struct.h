@@ -41,6 +41,7 @@ typedef struct s_file
 {
 	char    *path;
 	int     fd;
+	int     arch;
 }   t_file;
 
 typedef struct s_args

@@ -128,7 +128,7 @@ clean:
 
 fclean:			clean
 				@printf "$(YELLOW)Deleting build directory...$(DEFAULT)\n"
-				@$(RM) $(BUILDIR) $(NAME) $(BUILDIR_B) $(NAME_B)
+				@$(RM) $(BUILDIR) $(NAME) $(BUILDIR_B) $(NAME_B) ./change_byte
 				@make -C $(LIBS) fclean
 				@printf "$(DELPREV)Build directory and binary deleted\n"
 
@@ -137,3 +137,6 @@ re:				fclean
 
 rebonus:		fclean
 				$(MAKE) -s bonus
+
+change:
+	 gcc -Wall -Wextra -Werror ./test/changedata.c -o change_byte
