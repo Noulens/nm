@@ -7,7 +7,8 @@
 static void clr_struct(void *ptr)
 {
 	t_file *file = (t_file*)ptr;
-	free(file->path);
+	if (file->path)
+		free(file->path);
 }
 
 void    free_list(t_list **begin)

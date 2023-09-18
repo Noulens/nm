@@ -76,6 +76,7 @@ void    check_args(int ac, char **av, t_args *args)
 						break;
 					default:
 						ft_fprintf(2, INVALID_OPT, **av);
+						free_list(&args->fl);
 						exit(1);
 				}
 				++*av;
