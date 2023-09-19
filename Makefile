@@ -18,6 +18,7 @@ SRCS		=	$(addprefix srcs/,					\
 										main.c		\
 					$(addprefix files/,	free.c		\
 										proceed.c	\
+										display.c	\
 					)								\
 				)
 
@@ -25,6 +26,7 @@ SRCS_B		=	$(addprefix srcs/,					\
                 						main.c		\
                 	$(addprefix files,	free.c		\
 										proceed.c	\
+										display.c	\
                 	)								\
                 )
 
@@ -139,4 +141,4 @@ rebonus:		fclean
 				$(MAKE) -s bonus
 
 change:
-	 			$(CC) $(CFLAGS) ./test/changedata.c -o change_byte
+	 			$(CC) $(CFLAGS) -m32 ./test/changedata.c -o change_byte

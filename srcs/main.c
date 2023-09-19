@@ -92,10 +92,10 @@ void    check_args(int ac, char **av, t_args *args)
 
 int main(int ac, char **av)
 {
-	t_args  args = {0, 0, NULL};
+	t_args  args = {0, 0, NULL, 0};
 
 	check_args(ac, av, &args);
 	proceed(&args);
 	free_list(&args.fl);
-	return (0);
+	return (args.exit);
 }

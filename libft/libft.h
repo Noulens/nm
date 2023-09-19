@@ -118,5 +118,7 @@ float		ft_atof(const char *str);
 double		ft_atod(const char *str);
 void		ft_putfloat_fd(float x, int precision, int fd);
 void        reverseEndianness(void *data, int size);
+int         ft_ld(int nbr);
+char        *ft_ltoa(long nbr);
 
 #endif

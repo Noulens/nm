@@ -16,24 +16,7 @@ static int check_size(t_file *file, int arch)
 
 static void parseElfHeader(t_file *file, uint8_t *map)
 {
-	Elf32_Ehdr  *ehdr32 = NULL;
-	Elf64_Ehdr  *ehdr64 = NULL;
-	if (file->hdr_opt & X86)
-	{
-		ehdr32 = (Elf32_Ehdr *)map;
-		for (int i = 0; i < 16; i++)
-		{
-			ft_fprintf(1, "%x ", ehdr32->e_ident[i]);
-		}
-	}
-	else
-	{
-		ehdr64 = (Elf64_Ehdr *)map;
-		for (int i = 0; i < 16; i++)
-		{
-			ft_fprintf(1, "%x ", ehdr64->e_ident[i]);
-		}
-	}
+	printEhdr(file, map);
 }
 
 static void  check_magic(t_file *file, uint8_t *map)
@@ -74,46 +57,46 @@ static void stating(t_file *file, struct stat *sb)
 	file->fd = open(file->path, O_RDONLY);
 	if (file->fd == -1)
 	{
-		ft_fprintf(STDERR_FILENO, OPEN_ERR, file->path, strerror(errno));
+		ft_fprintf(STDERR_FILENO, SYS_ERR"\n", file->path, strerror(errno));
 		file->hdr_opt |= ERROR;
 		return ;
 	}
 	if (fstat(file->fd, sb) == -1)
 	{
-		ft_fprintf(STDERR_FILENO, "ft_nm: fstat: %s", strerror(errno));
+		ft_fprintf(STDERR_FILENO, SYS_ERR"\n", "fstat", strerror(errno));
 		file->hdr_opt |= ERROR;
 		return ;
 	}
 	switch (sb->st_mode & S_IFMT)
 	{
 		case S_IFBLK:
-			ft_fprintf(STDERR_FILENO, NOT_ELF": block device", file->path);
+			ft_fprintf(STDERR_FILENO, NOT_ELF": block device\n", file->path);
 			file->hdr_opt |= ERROR;
 			break ;
 		case S_IFCHR:
-			ft_fprintf(STDERR_FILENO, NOT_ELF": character device", file->path);
+			ft_fprintf(STDERR_FILENO, NOT_ELF": character device\n", file->path);
 			file->hdr_opt |= ERROR;
 			break ;
 		case S_IFDIR:
-			ft_fprintf(STDERR_FILENO, NOT_ELF": directory", file->path);
+			ft_fprintf(STDERR_FILENO, NOT_ELF": directory\n", file->path);
 			file->hdr_opt |= ERROR;
 			break ;
 		case S_IFIFO:
-			ft_fprintf(STDERR_FILENO, NOT_ELF": FIFO/pipe", file->path);
+			ft_fprintf(STDERR_FILENO, NOT_ELF": FIFO/pipe\n", file->path);
 			file->hdr_opt |= ERROR;
 			break ;
 		case S_IFLNK:
-			ft_fprintf(STDERR_FILENO, NOT_ELF": symlink", file->path);
+			ft_fprintf(STDERR_FILENO, NOT_ELF": symlink\n", file->path);
 			file->hdr_opt |= ERROR;
 			break ;
 		case S_IFSOCK:
-			ft_fprintf(STDERR_FILENO, NOT_ELF": socket", file->path);
+			ft_fprintf(STDERR_FILENO, NOT_ELF": socket\n", file->path);
 			file->hdr_opt |= ERROR;
 			break ;
 		case S_IFREG:
 			break;
 		default:
-			ft_fprintf(STDERR_FILENO, NOT_ELF": unknown?", file->path);
+			ft_fprintf(STDERR_FILENO, NOT_ELF": unknown?\n", file->path);
 			file->hdr_opt |= ERROR;
 			break ;
 	}
@@ -127,13 +110,14 @@ static void mapping(t_file *file, struct stat *sb, uint8_t **map)
 	*map = (uint8_t *)mmap(NULL, (*sb).st_size, PROT_READ, MAP_PRIVATE, file->fd, 0);
 	if (*map == MAP_FAILED)
 	{
-		ft_fprintf(STDERR_FILENO, "ft_nm: mmap: %s", strerror(errno));
+		file->hdr_opt |= ERROR;
+		ft_fprintf(STDERR_FILENO, SYS_ERR"\n", "mmap", strerror(errno));
 		return ;
 	}
 	check_magic(file, *map);
 	if (file->hdr_opt & ERROR)
 	{
-		ft_fprintf(STDERR_FILENO, NOT_ELF, file->path);
+		ft_fprintf(STDERR_FILENO, NOT_ELF"\n", file->path);
 		return ;
 	}
 	parseElfHeader(file, *map);
@@ -152,12 +136,21 @@ void    proceed(t_args *args)
 		if (args->fds > 1)
 			ft_printf("%s:\n", file->path);
 		stating(file, &sb);
-		mapping(file, &sb, &map);
-		if (map != MAP_FAILED && munmap(map, sb.st_size) < 0)
-			ft_fprintf(STDERR_FILENO, "ft_nm: munmap: %s", strerror(errno));
+		if (!(file->hdr_opt & ERROR))
+		{
+			mapping(file, &sb, &map);
+			if (map != MAP_FAILED && munmap(map, sb.st_size) < 0)
+				ft_fprintf(STDERR_FILENO, SYS_ERR"\n", "munmap", strerror(errno));
+		}
 		if (file->fd != -1 && close(file->fd) < 0)
-			ft_fprintf(STDERR_FILENO, "ft_nm: close fd: %s", strerror(errno));
-		ft_putchar_fd('\n', 1);
+		{
+			file->hdr_opt |= ERROR;
+			ft_fprintf(STDERR_FILENO, SYS_ERR"\n", file->path, strerror(errno));
+		}
+		if (!(file->hdr_opt & ERROR))
+			ft_putchar_fd(1, '\n');
+		else
+			args->exit = 1;
 		tmp = tmp->next;
 	}
 }

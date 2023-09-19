@@ -18,38 +18,43 @@ static int	ft_percentage(void)
 	return (1);
 }
 
-static	int	ft_print_format(const char *format, va_list arg)
+static	int	ft_print_format(int j, const char *format, va_list arg)
 {
-	int	j;
+	int	i;
 
-	j = 0;
+	i = j;
 	if (*format == 'd' || *format == 'i')
-		return (j = ft_di(va_arg(arg, int)));
+		return (i += ft_di(va_arg(arg, int)));
 	else if (*format == 'c')
-		return (j = ft_c(va_arg(arg, int)));
+		return (i += ft_c(va_arg(arg, int)));
 	else if (*format == 'p')
-		return (j = ft_p(va_arg(arg, void *)));
+		return (i += ft_p(va_arg(arg, void *)));
 	else if (*format == 's')
-		return (j = ft_s(va_arg(arg, char *)));
+		return (i += ft_s(va_arg(arg, char *)));
 	else if (*format == 'x' || *format == 'X' || *format == 'u')
-		return (j = ft_xupx(va_arg(arg, unsigned int), *format));
+		return (i += ft_xupx(va_arg(arg, unsigned int), *format));
 	else if (*format == '%')
-		return (j = ft_percentage());
+		return (i += ft_percentage());
+	else if (*format == 'l' && *(format + 1) == 'd')
+		return (i += ft_ld(va_arg(arg, long)));
 	else
 		return (-1);
 }
 
-int	ft_print_default(char c)
+int	ft_print_default(int j, const char c)
 {
+	int i;
+
+	i = j;
 	ft_putchar_fd(c, 1);
-	return (1);
+	i += 1;
+	return (i);
 }
 
 int	ft_printf(const char *format, ...)
 {
 	va_list	arg;
 	int		j;
-	int		error;
 
 	j = 0;
 	va_start(arg, format);
@@ -57,21 +62,22 @@ int	ft_printf(const char *format, ...)
 	{
 		while (*format != '%' && *format)
 		{
-			j += ft_print_default(*format);
+			j = ft_print_default(j, *format);
 			++format;
 		}
 		if (*format == '\0')
 			return (j);
+		if (*(format + 1) == 'l' && *(format + 2) == 'd')
+		{
+			j = ft_print_format(j, ++format, arg);
+			++format;
+		}
 		else
-			error = ft_print_format(++format, arg);
-		if (error == -1)
+			j = ft_print_format(j, ++format, arg);
+		if (++format, j == -1)
 			return (-1);
-		else
-			j += error;
-		++format;
 	}
-	va_end(arg);
-	return (j);
+	return (va_end(arg), j);
 }
 
 /*#include <stdio.h>

@@ -20,9 +20,10 @@
 #define IS_ELF "File is an ELF file\n"
 #define NOT_ELF "ft_nm: %s: file format not recognized"
 #define INVALID_OPT "ft_nm: invalid option -- %c\n"
-#define OPEN_ERR "ft_nm: '%s': %s\n"
+#define SYS_ERR "ft_nm: '%s': %s"
 
 void    free_list(t_list **begin);
 void    proceed(t_args *args);
+void    printEhdr(const t_file *file, const uint8_t *map);
 
 #endif //FT_NM_H
