@@ -21,9 +21,15 @@
 #define NOT_ELF "ft_nm: %s: file format not recognized"
 #define INVALID_OPT "ft_nm: invalid option -- %c\n"
 #define SYS_ERR "ft_nm: '%s': %s"
+#define SPACE "                                                    "
+#define PADDING_EHDR 52
+#define PADDING_SHT 30
 
 void    free_list(t_list **begin);
 void    proceed(t_args *args);
-void    printEhdr(const t_file *file, const uint8_t *map);
+void    printEhdr64(const t_file *file, const uint8_t *map);
+void    printEhdr32(const t_file *file, const uint8_t *map);
+void    printSht64(const t_file *file, const uint8_t *map);
+void    printSht32(const t_file *file, const uint8_t *map);
 
 #endif //FT_NM_H

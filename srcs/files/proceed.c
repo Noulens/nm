@@ -16,7 +16,16 @@ static int check_size(t_file *file, int arch)
 
 static void parseElfHeader(t_file *file, uint8_t *map)
 {
-	printEhdr(file, map);
+	if (file->hdr_opt & X86_64)
+	{
+		printEhdr64(file, map);
+		printSht64(file, map);
+	}
+	else
+	{
+		printEhdr32(file, map);
+		printSht32(file, map);
+	}
 }
 
 static void  check_magic(t_file *file, uint8_t *map)

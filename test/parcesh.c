@@ -35,7 +35,7 @@ void parseSht (uint8_t *map) {
 	for (int i = 0; i < ehdr->e_shnum; ++i) {
 
 		/* sh_name */
-		fprintf (stderr, "[%d] %s index %s\n\t", i, &shstrtab[sht[i].sh_name], &shstrtab[sht[ehdr->e_shstrndx].sh_name]);
+		fprintf (stderr, "[%d] %s size %s\n\t", i, &shstrtab[sht[i].sh_name], &shstrtab[sht[ehdr->e_shstrndx].sh_name]);
 
 		/* sh_type */
 		switch (sht[i].sh_type) {
