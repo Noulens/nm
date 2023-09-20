@@ -179,7 +179,7 @@ void    printSht64(const t_file *file, const uint8_t *map)
 		if (sht[i].sh_flags & SHF_MERGE)
 			ft_printf("M");
 		else if (sht[i].sh_flags)
-			ft_printf(" other flags");
+			ft_printf("+others");
 		else
 			ft_printf("no flags");
 		ft_putchar_fd('\n', 1);
