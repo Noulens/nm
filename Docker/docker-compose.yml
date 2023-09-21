@@ -5,3 +5,13 @@ services:
     container_name: nm
     build: Docker
     restart: on-failure
+    volumes:
+      - nm_vol:/ft_nm
+
+volumes:
+  nm_vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /home/tnoulens/data/nm

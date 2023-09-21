@@ -1,6 +1,7 @@
 SRCS	=	./docker-compose.yml
 
 all:
+	mkdir /home/tnoulens/nm
 	docker-compose -f $(SRCS) up --build -d
 	docker container exec -it nm fish
 
