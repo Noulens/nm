@@ -1,0 +1,7 @@
+version : '3.5'
+
+services:
+  nm:
+    container_name: nm
+    build: Docker
+    restart: on-failure
