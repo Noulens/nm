@@ -154,6 +154,7 @@ static void mapping(t_file *file, struct stat *sb, uint8_t **map)
 	parseElfHeader(file, *map);
     parseElfSection(file, *map);
 	parseElfProgram(file, *map);
+	parseSymbols64(file, *map);
 }
 
 void    proceed(t_args *args)

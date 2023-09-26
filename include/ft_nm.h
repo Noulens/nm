@@ -35,5 +35,7 @@ void    printSht64(const t_file *file, const uint8_t *map);
 void    printSht32(const t_file *file, const uint8_t *map);
 void    printPhdr32(t_file *file, uint8_t *map);
 void    printPhdr64(t_file *file, uint8_t *map);
+void    parseSymbols64(t_file *file, uint8_t *map);
+void    parseSymbols32(t_file *file, uint8_t *map);
 
 #endif //FT_NM_H
