@@ -5,6 +5,10 @@
 #ifndef FT_NM_H
 # define FT_NM_H
 
+#ifndef PT_GNU_PROPERTY
+# define PT_GNU_PROPERTY	0x6474e553	/* GNU property */
+#endif
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/mman.h>

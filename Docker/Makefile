@@ -1,7 +1,7 @@
 SRCS	=	./docker-compose.yml
 
 all:
-	mkdir /home/tnoulens/nm
+	mkdir -p /home/tnoulens/nm
 	docker-compose -f $(SRCS) up --build -d
 	docker container exec -it nm fish
 
@@ -22,13 +22,11 @@ fclean:
     docker rm $$(docker ps -qa);\
     docker rmi -f $$(docker images -qa);\
 	docker system prune -af
-	docker volume prune -af
 
 re: fclean
 	@$(MAKE) all
 
 prune:
 	docker system prune -f
-	docker volume prune -f
 
 .PHONY:	all up down ps top clean fclean prune
