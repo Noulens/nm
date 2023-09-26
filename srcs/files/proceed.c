@@ -19,12 +19,34 @@ static void parseElfHeader(t_file *file, uint8_t *map)
 	if (file->hdr_opt & X86_64)
 	{
 		printEhdr64(file, map);
-		printSht64(file, map);
 	}
 	else
 	{
 		printEhdr32(file, map);
-		printSht32(file, map);
+	}
+}
+
+static void parseElfSection(t_file *file, uint8_t *map)
+{
+    if (file->hdr_opt & X86_64)
+    {
+        printSht64(file, map);
+    }
+    else
+    {
+        printSht32(file, map);
+    }
+}
+
+static void parseElfProgram(t_file *file, uint8_t *map)
+{
+	if (file->hdr_opt & X86_64)
+	{
+		printPhdr64(file, map);
+	}
+	else
+	{
+		printPhdr32(file, map);
 	}
 }
 
@@ -130,6 +152,8 @@ static void mapping(t_file *file, struct stat *sb, uint8_t **map)
 		return ;
 	}
 	parseElfHeader(file, *map);
+    parseElfSection(file, *map);
+	parseElfProgram(file, *map);
 }
 
 void    proceed(t_args *args)

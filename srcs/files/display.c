@@ -119,7 +119,7 @@ void    printSht64(const t_file *file, const uint8_t *map)
 
 	ft_printf("\nSection header string tab, first string is  NULL: '%s'\n", shstr);
 	write(1, SPACE, PADDING_SHT);
-	ft_printf("type\tsize\tflags\n");
+	ft_printf("type\tsize\tflags\taddress\n");
 	for (int i = 0; i < ehdr->e_shnum; i++)
 	{
 		len = ft_printf("[%d] %s ", i, &shstr[sht[i].sh_name]);
@@ -179,9 +179,10 @@ void    printSht64(const t_file *file, const uint8_t *map)
 		if (sht[i].sh_flags & SHF_MERGE)
 			ft_printf("M");
 		else if (sht[i].sh_flags)
-			ft_printf("+others");
+			ft_printf("+");
 		else
-			ft_printf("no flags");
+			ft_printf("nof");
+		ft_printf("\t0x%X", sht[i].sh_addr);
 		ft_putchar_fd('\n', 1);
 	}
 	(void)file;
@@ -217,7 +218,7 @@ void    printSht32(const t_file *file, const uint8_t *map)
 
 	ft_printf("\nSection header string tab, first string is  NULL: '%s'\n", shstr);
 	write(1, SPACE, PADDING_SHT);
-	ft_printf("type\tsize\tflags\n");
+	ft_printf("type\tsize\tflags\taddress\n");
 	for (int i = 0; i < ehdr->e_shnum; i++)
 	{
 		len = ft_printf("[%d] %s ", i, &shstr[sht[i].sh_name]);
@@ -277,9 +278,172 @@ void    printSht32(const t_file *file, const uint8_t *map)
 		if (sht[i].sh_flags & SHF_MERGE)
 			ft_printf("M");
 		else if (sht[i].sh_flags)
-			ft_printf(" other flags");
+			ft_printf("+");
 		else
-			ft_printf("no flags");
+			ft_printf("nof");
+		ft_printf("\t0x%X", sht[i].sh_addr);
+		ft_putchar_fd('\n', 1);
+	}
+	(void)file;
+}
+
+void    printPhdr64(t_file *file, uint8_t *map)
+{
+	Elf64_Ehdr  *ehdr = (Elf64_Ehdr *)map;
+	Elf64_Phdr  *phdr = (Elf64_Phdr *)&map[ehdr->e_phoff];
+
+	ft_printf("\nProgram Headers\n");
+	ft_printf("Type"SPACE_PHDR"Offset\tVirtAd\tPhysAd\tFileSiz\tMemSiz\tAlign\tFlg\n\n");
+	for (int i = 0; i < ehdr->e_phnum; i++)
+	{
+		int len;
+		switch (phdr[i].p_type)
+		{
+			case PT_NULL:
+				len = ft_printf("NULL");
+				break;
+			case PT_LOAD:
+				len = ft_printf("LOAD");
+				break;
+			case PT_DYNAMIC:
+				len = ft_printf("DYNAMIC");
+				break;
+			case PT_INTERP:
+				len = ft_printf("INTERP");
+				break;
+			case PT_NOTE:
+				len = ft_printf("NOTE");
+				break;
+			case PT_SHLIB:
+				len = ft_printf("SHLIB");
+				break;
+			case PT_PHDR:
+				len = ft_printf("PHDR");
+				break;
+			case PT_TLS:
+				len = ft_printf("TLS");
+				break;
+			case PT_GNU_EH_FRAME:
+				len = ft_printf("GNU_EH_FRAME");
+				break;
+			case PT_GNU_STACK:
+				len = ft_printf("GNU_STACK");
+				break;
+			case PT_NUM :
+				len = ft_printf("NUM");
+				break;
+			case PT_LOOS :
+				len = ft_printf("LOOS");
+				break;
+			case PT_GNU_RELRO:
+				len = ft_printf("GNU_RELRO");
+				break;
+			case PT_GNU_PROPERTY:
+				len = ft_printf("GNU_PROPERTY");
+				break;
+			case PT_HIOS:
+				len = ft_printf("HIOS");
+				break;
+			case PT_LOPROC:
+				len = ft_printf("LOPROC");
+				break;
+			case PT_HIPROC:
+				len = ft_printf("HIPROC");
+				break;
+		}
+		write(1, SPACE, PADDING_PHDR - (len > 30 ? 0 : len));
+		ft_printf("\t0x%x\t0x%x\t0x%x\t0x%x\t0x%x\t0x%x\t",
+		          phdr[i].p_offset, phdr[i].p_vaddr, phdr[i].p_paddr,
+		          phdr[i].p_filesz, phdr[i].p_memsz, phdr[i].p_align);
+		if (phdr[i].p_flags & PF_X)
+			ft_printf("%s", "E");
+		if (phdr[i].p_flags & PF_W)
+			ft_printf("%s", "W");
+		if (phdr[i].p_flags & PF_R)
+			ft_printf("%s", "R");
+		else
+			ft_printf("%s", "nof");
+		ft_putchar_fd('\n', 1);
+	}
+	(void)file;
+}
+
+void    printPhdr32(t_file *file, uint8_t *map)
+{
+	Elf32_Ehdr  *ehdr = (Elf32_Ehdr *)map;
+	Elf32_Phdr  *phdr = (Elf32_Phdr *)&map[ehdr->e_phoff];
+
+	ft_printf("\nProgram Headers\n");
+	ft_printf("Type"SPACE_PHDR"Offset\tVirtAd\tPhysAd\tFileSiz\tMemSiz\tAlign\tFlg\n\n");
+	for (int i = 0; i < ehdr->e_phnum; i++)
+	{
+		int len;
+		switch (phdr[i].p_type)
+		{
+			case PT_NULL:
+				len = ft_printf("NULL");
+				break;
+			case PT_LOAD:
+				len = ft_printf("LOAD");
+				break;
+			case PT_DYNAMIC:
+				len = ft_printf("DYNAMIC");
+				break;
+			case PT_INTERP:
+				len = ft_printf("INTERP");
+				break;
+			case PT_NOTE:
+				len = ft_printf("NOTE");
+				break;
+			case PT_SHLIB:
+				len = ft_printf("SHLIB");
+				break;
+			case PT_PHDR:
+				len = ft_printf("PHDR");
+				break;
+			case PT_TLS:
+				len = ft_printf("TLS");
+				break;
+			case PT_GNU_EH_FRAME:
+				len = ft_printf("GNU_EH_FRAME");
+				break;
+			case PT_GNU_STACK:
+				len = ft_printf("GNU_STACK");
+				break;
+			case PT_NUM :
+				len = ft_printf("NUM");
+				break;
+			case PT_LOOS :
+				len = ft_printf("LOOS");
+				break;
+			case PT_GNU_RELRO:
+				len = ft_printf("GNU_RELRO");
+				break;
+			case PT_GNU_PROPERTY:
+				len = ft_printf("GNU_PROPERTY");
+				break;
+			case PT_HIOS:
+				len = ft_printf("HIOS");
+				break;
+			case PT_LOPROC:
+				len = ft_printf("LOPROC");
+				break;
+			case PT_HIPROC:
+				len = ft_printf("HIPROC");
+				break;
+		}
+		write(1, SPACE, PADDING_PHDR - (len > 30 ? 0 : len));
+		ft_printf("\t0x%x\t0x%x\t0x%x\t0x%x\t0x%x\t0x%x\t",
+		          phdr[i].p_offset, phdr[i].p_vaddr, phdr[i].p_paddr,
+		          phdr[i].p_filesz, phdr[i].p_memsz, phdr[i].p_align);
+		if (phdr[i].p_flags & PF_X)
+			ft_printf("%s", "E");
+		if (phdr[i].p_flags & PF_W)
+			ft_printf("%s", "W");
+		if (phdr[i].p_flags & PF_R)
+			ft_printf("%s", "R");
+		else
+			ft_printf("%s", "nof");
 		ft_putchar_fd('\n', 1);
 	}
 	(void)file;

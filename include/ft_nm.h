@@ -22,8 +22,10 @@
 #define INVALID_OPT "ft_nm: invalid option -- %c\n"
 #define SYS_ERR "ft_nm: '%s': %s"
 #define SPACE "                                                    "
+#define SPACE_PHDR "            "
 #define PADDING_EHDR 52
 #define PADDING_SHT 30
+#define PADDING_PHDR 13
 
 void    free_list(t_list **begin);
 void    proceed(t_args *args);
@@ -31,5 +33,7 @@ void    printEhdr64(const t_file *file, const uint8_t *map);
 void    printEhdr32(const t_file *file, const uint8_t *map);
 void    printSht64(const t_file *file, const uint8_t *map);
 void    printSht32(const t_file *file, const uint8_t *map);
+void    printPhdr32(t_file *file, uint8_t *map);
+void    printPhdr64(t_file *file, uint8_t *map);
 
 #endif //FT_NM_H

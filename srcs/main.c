@@ -90,15 +90,18 @@ void    check_args(int ac, char **av, t_args *args)
 		add_node(args, "./a.out");
 }
 
-__attribute__((constructor)) void func()
-{
-	ft_printf("DEBUT: %s\n", __FUNCTION__ );
-}
-
-__attribute__((destructor(101))) void func2()
-{
-	ft_printf("FIN: %s\n", __FUNCTION__ );
-}
+/*
+ * constructor function are run before the main and destructor after exit
+ */
+//__attribute__((constructor)) void func()
+//{
+//	ft_printf("DEBUT: %s\n", __FUNCTION__ );
+//}
+//
+//__attribute__((destructor(101))) void func2()
+//{
+//	ft_printf("FIN: %s\n", __FUNCTION__ );
+//}
 
 int main(int ac, char **av)
 {
