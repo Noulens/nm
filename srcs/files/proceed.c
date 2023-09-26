@@ -6,8 +6,8 @@
 
 static int check_size(t_file *file, int arch)
 {
-	if (((arch & X86_64) && file->size < sizeof(Elf64_Ehdr))
-		|| ((arch & X86) && file->size < sizeof(Elf32_Ehdr)))
+	if (((arch & B64) && file->size < sizeof(Elf64_Ehdr))
+		|| ((arch & B32) && file->size < sizeof(Elf32_Ehdr)))
 	{
 		return (-1);
 	}
@@ -16,7 +16,7 @@ static int check_size(t_file *file, int arch)
 
 static void parseElfHeader(t_file *file, uint8_t *map)
 {
-	if (file->hdr_opt & X86_64)
+	if (file->hdr_opt & B64)
 	{
 		printEhdr64(file, map);
 	}
@@ -28,7 +28,7 @@ static void parseElfHeader(t_file *file, uint8_t *map)
 
 static void parseElfSection(t_file *file, uint8_t *map)
 {
-    if (file->hdr_opt & X86_64)
+    if (file->hdr_opt & B64)
     {
         printSht64(file, map);
     }
@@ -40,7 +40,7 @@ static void parseElfSection(t_file *file, uint8_t *map)
 
 static void parseElfProgram(t_file *file, uint8_t *map)
 {
-	if (file->hdr_opt & X86_64)
+	if (file->hdr_opt & B64)
 	{
 		printPhdr64(file, map);
 	}
@@ -57,10 +57,10 @@ static void  check_magic(t_file *file, uint8_t *map)
 		switch (map[4])
 		{
 			case 1:
-				file->hdr_opt |= X86;
+				file->hdr_opt |= B32;
 				break ;
 			case 2:
-				file->hdr_opt |= X86_64;
+				file->hdr_opt |= B64;
 				break ;
 			default:
 				file->hdr_opt |= ERROR;
@@ -154,7 +154,10 @@ static void mapping(t_file *file, struct stat *sb, uint8_t **map)
 	parseElfHeader(file, *map);
     parseElfSection(file, *map);
 	parseElfProgram(file, *map);
-	parseSymbols64(file, *map);
+	if (file->hdr_opt & B64)
+		parseSymbols64(file, *map);
+	else
+		parseSymbols32(file, *map);
 }
 
 void    proceed(t_args *args)

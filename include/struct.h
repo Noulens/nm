@@ -5,6 +5,12 @@
 #ifndef STRUCT_H
 # define STRUCT_H
 
+typedef union u_check_endian
+{
+	int     i;
+	char    bytes[4];
+}   t_check_endian;
+
 typedef enum e_options
 {
 	A = 0b00001,
@@ -41,8 +47,8 @@ typedef enum e_hdr
 {
 	LEND =      0b100000,
 	BEND =      0b1000000,
-	X86 =       0b10000000,
-	X86_64 =    0b100000000,
+	B32 =       0b10000000,
+	B64 =    0b100000000,
 	ERROR =     0b1000000000
 }   t_hdr;
 
@@ -57,6 +63,7 @@ typedef struct s_file
 typedef struct s_args
 {
 	u_int8_t    flags;
+	int         endianness;
 	int         fds;
 	t_list      *fl;
 	int         exit;

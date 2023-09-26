@@ -12,12 +12,17 @@
 
 #include "libft.h"
 
-void    reverseEndianness(void *data, int size)
+/*
+ * This function reverse the endianness of a data, it takes a pointer to the
+ * data and the size of the data in bytes (eg: sizeof(uint16_t)...
+ */
+
+void    reverseEndianness(void *data, size_t size)
 {
 	uint8_t *bytes;
 	uint8_t temp;
-	int     nb;
-	int     i;
+	size_t  nb;
+	size_t  i;
 
 	bytes = (uint8_t *)data;
 	nb = size / 2;
@@ -30,3 +35,13 @@ void    reverseEndianness(void *data, int size)
 		i++;
 	}
 }
+
+/*int main()
+{
+	uint64_t value64 = 0x123456789ABCDEF0ULL;
+
+	printf("Original 64-bit value: 0x%016lX\n", value64);
+	reverseEndianness(&value64, sizeof(value64));
+	printf("Reversed 64-bit value: 0x%016lX\n", value64);
+	return 0;
+}*/

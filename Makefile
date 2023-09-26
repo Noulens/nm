@@ -18,7 +18,10 @@ SRCS		=	$(addprefix srcs/,					\
 										main.c		\
 					$(addprefix files/,	free.c		\
 										proceed.c	\
-										display.c	\
+										init.c		\
+										display_32.c\
+										display_64.c\
+										tools.c		\
 					)								\
 				)
 
@@ -26,7 +29,10 @@ SRCS_B		=	$(addprefix srcs/,					\
                 						main.c		\
                 	$(addprefix files,	free.c		\
 										proceed.c	\
-										display.c	\
+										init.c		\
+										display_32.c\
+										display_64.c\
+										tools.c		\
                 	)								\
                 )
 
