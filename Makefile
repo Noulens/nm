@@ -1,7 +1,5 @@
 NAME		=	ft_nm
 
-NAME_B		=	b_ft_nm
-
 VPATH		=	srcs
 
 INCLDIR		=	$(addsuffix /include, .) $(LIBS)
@@ -9,8 +7,6 @@ INCLDIR		=	$(addsuffix /include, .) $(LIBS)
 LIBS		=	libft/
 
 BUILDIR		=	build
-
-BUILDIR_B	=	build_b
 
 SRCS_DIR	=	$(sort $(dir $(wildcard ./srcs/*/)))
 
@@ -25,20 +21,7 @@ SRCS		=	$(addprefix srcs/,					\
 					)								\
 				)
 
-SRCS_B		=	$(addprefix srcs/,					\
-                						main.c		\
-                	$(addprefix files,	free.c		\
-										proceed.c	\
-										init.c		\
-										display_32.c\
-										display_64.c\
-										tools.c		\
-                	)								\
-                )
-
 OBJ			=	$(SRCS:%.c=$(BUILDIR)/%.o)
-
-OBJ_B		=	$(SRCS_B:%.c=$(BUILDIR_B)/%.o)
 
 CFLAGS		=	-Wall -Wextra -Werror -g
 
@@ -85,23 +68,11 @@ BODY_WIDTH	=	$(shell printf "$$(($(HEAD_SIZE) - 1))")
 #Rules#
 #######
 
-ifeq (bonus, $(filter bonus,$(MAKECMDGOALS)))
-	DEFINE	=	-D BONUS=1
-else ifeq (rebonus, $(filter rebonus,$(MAKECMDGOALS)))
-	DEFINE	=	-D BONUS=1
-else ifeq (lcb, $(filter lcb,$(MAKECMDGOALS)))
-	DEFINE	=	-D BONUS=1
-else
-	DEFINE	=	-D BONUS=0
-endif
-
 .PHONY:	all bonus clean fclean re
 
 ##.SILENT:
 
 all:			change subsystem $(NAME)
-
-bonus:			subsystem $(NAME_B)
 
 subsystem: # Make the libft
 				@make -C $(LIBS) all
@@ -111,17 +82,6 @@ $(BUILDIR)/%.o:	%.c
 				@ printf "$(YELLOW)Compiling $@ and generating .o files...$(DEFAULT)\n"
 				$(CC) $(CFLAGS) $(DEFINE) $(INCFLAGS) -c $< -o $@
 				@ printf '$(DELPREV)%-*s$(GREEN)$(CHECK)$(DEFAULT)\n' $(BODY_WIDTH) $(notdir $@)
-
-$(BUILDIR_B)/%.o:	%.c
-				@mkdir -p build_b/ $(addprefix build_b/, $(SRCS_DIR))
-				@ printf "$(YELLOW)Compiling $@ and generating .o files...$(DEFAULT)\n"
-				@$(CC) $(CFLAGS) $(DEFINE) $(INCFLAGS) -c $< -o $@
-				@ printf '$(DELPREV)%-*s$(GREEN)$(CHECK)$(DEFAULT)\n' $(BODY_WIDTH) $(notdir $@)
-
-$(NAME_B):		$(OBJ_B)
-				@ printf "$(YELLOW)Linking source files and generating $@ binary...\n$(DEFAULT)"
-				$(CC) $(CFLAGS) $(DEFINE) $(INCFLAGS) -o $@ $^ $(LDFLAGS)
-				@ printf "$(DELPREV)$(GREEN)Binary generated$(DEFAULT)\n"
 
 $(NAME):		$(OBJ)
 				@ printf "$(YELLOW)Linking source files and generating $@ binary...\n$(DEFAULT)"
@@ -142,9 +102,6 @@ fclean:			clean
 
 re:				fclean
 				@$(MAKE) -s all
-
-rebonus:		fclean
-				$(MAKE) -s bonus
 
 change:
 	 			$(CC) $(CFLAGS) -m32 ./test/changedata.c -o change_byte
