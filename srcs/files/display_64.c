@@ -217,50 +217,8 @@ void    printPhdr64(t_file *file, uint8_t *map)
 	(void)file;
 }
 
-void    parseSymbols64(t_file *file, uint8_t *map)
+void print_dynsym(const Elf64_Sym *dynsym, uint64_t dynsym_size, const char *dynstr)
 {
-	Elf64_Ehdr      *ehdr = (Elf64_Ehdr *)map;
-	Elf64_Shdr      *sht = (Elf64_Shdr *)&map[ehdr->e_shoff];
-	const uint8_t   *shstrtab = &map[sht[ehdr->e_shstrndx].sh_offset];
-	Elf64_Sym       *symtab = NULL;
-	uint64_t        symtab_size = 0;
-	char            *symstr = NULL;
-	Elf64_Sym       *dynsym = NULL;
-	uint64_t        dynsym_size = 0;
-	char            *dynstr = NULL;
-
-	ft_printf("Sections containing symbols:\n");
-	for (size_t i = 0; i < ehdr->e_shnum; i++)
-	{
-		const uint8_t   *section_name = &shstrtab[sht[i].sh_name];
-
-		if (!ft_strncmp(".dynsym", (const char *)section_name, 7)
-			&& sht[i].sh_type == SHT_DYNSYM)
-		{
-			ft_printf("%s shdr @ 0x%x\n", section_name, sht[i].sh_offset);
-			dynsym = (Elf64_Sym *)&map[sht[i].sh_offset];
-			dynsym_size = sht[i].sh_size;
-		}
-		else if (!ft_strncmp(".dynstr", (const char *)section_name, 7)
-			&& sht[i].sh_type == SHT_STRTAB)
-		{
-			ft_printf("%s shdr @ 0x%x\n", section_name, sht[i].sh_offset);
-			dynstr = (char *)&map[sht[i].sh_offset];
-		}
-		else if (!ft_strncmp(".symtab", (const char *)section_name, 7)
-			&& sht[i].sh_type == SHT_SYMTAB)
-		{
-			ft_printf("%s shdr @ 0x%x\n", section_name, sht[i].sh_offset);
-			symtab = (Elf64_Sym *)&map[sht[i].sh_offset];
-			symtab_size = sht[i].sh_size;
-		}
-		else if (!ft_strncmp(".strtab", (const char *)section_name, 7)
-			&& sht[i].sh_type == SHT_STRTAB)
-		{
-			ft_printf("%s shdr @ 0x%x\n", section_name, sht[i].sh_offset);
-			symstr = (char *)&map[sht[i].sh_offset];
-		}
-	}
 	ft_printf ("\n# .dynsym entries:\n");
 	for (uint64_t i = 0; i < (dynsym_size / sizeof(Elf64_Sym)); i++)
 	{
@@ -276,12 +234,31 @@ void    parseSymbols64(t_file *file, uint8_t *map)
 			write(1, ZERO_PAD, 16 - ft_strlen(buffer));
 			ft_printf("%s ", buffer);
 		}
-		char    *symname = &dynstr[dynsym[i].st_name];
+		const char  *symname = &dynstr[dynsym[i].st_name];
 		if (*symname == '\x00')
 			ft_printf("NULL\n");
 		else
 			ft_printf("%s\n", symname);
 	}
+}
+
+char    put_symbol64(const Elf64_Sym *symtab)
+{
+	switch (symtab->st_info)
+	{
+		case STT_FUNC:
+			if ((symtab->st_info & STB_LOCAL))
+				return ('t');
+			else
+				return ('T');
+		case STT_FILE:
+			return ('a');
+	}
+	return ('?');
+}
+
+void print_symtab(const Elf64_Sym *symtab, uint64_t symtab_size, const char *symstr)
+{
 	ft_printf ("\n# .symtab entries:\n");
 	for (uint64_t i = 0; i < (symtab_size / sizeof(Elf64_Sym)); i++)
 	{
@@ -292,17 +269,77 @@ void    parseSymbols64(t_file *file, uint8_t *map)
 		}
 		else
 		{
-			char    buffer[16];
+			char    buffer[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 			hex(buffer, symtab[i].st_value);
 			write(1, ZERO_PAD, 16 - ft_strlen(buffer));
 			ft_printf("%s ", buffer);
 		}
-		char    *symname = &symstr[symtab[i].st_name];
+		ft_printf("%c ",put_symbol64(&symtab[i]));
+		const char  *symname = &symstr[symtab[i].st_name];
 		if (*symname == '\x00')
-			ft_printf("NULL ");
+			ft_printf("NULL\n");
 		else
-			ft_printf("%s ", symname);
-		ft_printf("%c\n", (char)symtab[i].st_info);
+			ft_printf("%s\n", symname);
 	}
+}
+
+void    spotDynSection(const uint8_t *map, const Elf64_Shdr *sht, size_t i, const uint8_t *section_name, Elf64_Sym **dynsym,
+               uint64_t *dynsym_size, char **dynstr)
+{
+	if (!ft_strncmp(".dynsym", (const char *)section_name, 7)
+    && sht[i].sh_type == SHT_DYNSYM)
+	{
+		ft_printf("%s shdr @ 0x%x\n", section_name, sht[i].sh_offset);
+		(*dynsym) = (Elf64_Sym *)&map[sht[i].sh_offset];
+		(*dynsym_size) = sht[i].sh_size;
+	}
+	else if (!ft_strncmp(".dynstr", (const char *)section_name, 7)
+		&& sht[i].sh_type == SHT_STRTAB)
+	{
+		ft_printf("%s shdr @ 0x%x\n", section_name, sht[i].sh_offset);
+		(*dynstr) = (char *)&map[sht[i].sh_offset];
+	}
+}
+
+void    spotSymSection(const uint8_t *map, const Elf64_Shdr *sht, size_t i, const uint8_t *section_name, Elf64_Sym **symtab,
+               uint64_t *symtab_size, char **symstr)
+{
+	if (!ft_strncmp(".symtab", (const char *)section_name, 7)
+    && sht[i].sh_type == SHT_SYMTAB)
+	{
+		ft_printf("%s shdr @ 0x%x\n", section_name, sht[i].sh_offset);
+		(*symtab) = (Elf64_Sym *)&map[sht[i].sh_offset];
+		(*symtab_size) = sht[i].sh_size;
+	}
+	else if (!ft_strncmp(".strtab", (const char *)section_name, 7)
+		&& sht[i].sh_type == SHT_STRTAB)
+	{
+		ft_printf("%s shdr @ 0x%x\n", section_name, sht[i].sh_offset);
+		(*symstr) = (char *)&map[sht[i].sh_offset];
+	}
+}
+
+void    parseSymbols64(t_file *file, uint8_t *map)
+{
+	Elf64_Ehdr      *ehdr = (Elf64_Ehdr *)map;
+	Elf64_Shdr      *sht = (Elf64_Shdr *)&map[ehdr->e_shoff];
+	const uint8_t   *shstrtab = &map[sht[ehdr->e_shstrndx].sh_offset];
+	Elf64_Sym       *symtab = NULL;
+	uint64_t        symtab_size = 0;
+	char            *symstr = NULL;
+//	Elf64_Sym       *dynsym = NULL;
+//	uint64_t        dynsym_size = 0;
+//	char            *dynstr = NULL;
+
+	ft_printf("Sections containing symbols:\n");
+	for (size_t i = 0; i < ehdr->e_shnum; i++)
+	{
+		const uint8_t   *section_name = &shstrtab[sht[i].sh_name];
+
+//		spotDynSection(map, sht, i, section_name, &dynsym, &dynsym_size, &dynstr);
+		spotSymSection(map, sht, i, section_name, &symtab, &symtab_size, &symstr);
+	}
+//	print_dynsym(dynsym, dynsym_size, dynstr);
+	print_symtab(symtab, symtab_size, symstr);
 	(void)file;
 }

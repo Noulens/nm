@@ -45,6 +45,6 @@ void    printPhdr32(t_file *file, uint8_t *map);
 void    printPhdr64(t_file *file, uint8_t *map);
 void    parseSymbols64(t_file *file, uint8_t *map);
 void    parseSymbols32(t_file *file, uint8_t *map);
-char    *hex(char *str, unsigned long nbr);
+void    hex(char *str, unsigned long nbr);
 
 #endif //FT_NM_H

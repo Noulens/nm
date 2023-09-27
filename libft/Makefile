@@ -95,7 +95,8 @@ SRCS		=	ft_isalpha.c\
 				ft_putfloat_fd.c\
 				reverseEndianness.c\
 				ft_ld.c\
-				ft_ltoa.c
+				ft_ltoa.c\
+				ft_lstsort.c
 
 
 OBJS		=	${SRCS:.c=.o}
