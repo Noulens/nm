@@ -22,7 +22,7 @@ t_args  init_args()
 
 t_file  init_file(char *ptr, int opt)
 {
-	return ((t_file){ptr, -1, opt, 0});
+	return ((t_file){ptr, -1, opt, 0, NULL});
 }
 
 static void    add_node(t_args *args, const char *path)

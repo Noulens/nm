@@ -23,6 +23,7 @@ typedef enum e_options
 typedef enum e_objs
 {
 	o_A,
+	o_a,
 	o_B,
 	o_C,
 	o_D,
@@ -58,6 +59,7 @@ typedef struct s_file
 	int     fd;
 	int     hdr_opt;
 	size_t  size;
+	t_list  *objlst;
 }   t_file;
 
 typedef struct s_args
@@ -68,5 +70,12 @@ typedef struct s_args
 	t_list      *fl;
 	int         exit;
 }   t_args;
+
+typedef struct s_obj
+{
+	char    *value;
+	char    *type;
+	char    *name;
+}   t_obj;
 
 #endif //STRUCT_H

@@ -34,8 +34,10 @@
 #define PADDING_PHDR 13
 
 t_args  init_args();
+void    add_node_obj(t_file *file, char *value, char *type, char *name);
 void    check_args(int ac, char **av, t_args *args);
 void    free_list(t_list **begin);
+void    free_list_obj(t_list **begin);
 void    proceed(t_args *args);
 void    printEhdr64(const t_file *file, const uint8_t *map);
 void    printEhdr32(const t_file *file, const uint8_t *map);
@@ -46,5 +48,8 @@ void    printPhdr64(t_file *file, uint8_t *map);
 void    parseSymbols64(t_file *file, uint8_t *map);
 void    parseSymbols32(t_file *file, uint8_t *map);
 void    hex(char *str, unsigned long nbr);
+void    displayLstObj(t_list **begin);
+void    displayLstObjR(t_list **begin);
+void    displayLstObjS(t_list **begin);
 
 #endif //FT_NM_H

@@ -4,6 +4,95 @@
 
 #include "ft_nm.h"
 
+static void lstsort(t_list **begin_list, int (*cmp)(const char *, const char *))
+{
+	t_list	*ptr;
+	void	*temp;
+	t_obj   *obj1;
+	t_obj   *obj2;
+
+	ptr = *begin_list;
+	if (!ptr)
+		return ;
+	while (ptr->next)
+	{
+		obj1 = (t_obj *)ptr->content;
+		obj2 = (t_obj *)ptr->next->content;
+		if (cmp(obj1->name, obj2->name) > 0)
+		{
+			temp = ptr->content;
+			ptr->content = ptr->next->content;
+			ptr->next->content = temp;
+			ptr = *begin_list;
+		}
+		else
+			ptr = ptr->next;
+	}
+}
+
+void    add_node_obj(t_file *file, char *value, char *type, char *name)
+{
+	t_list  *temp = NULL;
+	t_obj   *obj_to_add = NULL;
+
+	obj_to_add = malloc(sizeof(t_obj));
+	if (!obj_to_add)
+	{
+		perror("ft_nm: add_node_obj");
+		file->hdr_opt |= ERROR;
+		return ;
+	}
+	obj_to_add->value = value;
+	obj_to_add->type = type;
+	obj_to_add->name = name;
+	temp = ft_lstnew((void *)obj_to_add);
+	if (!temp)
+	{
+		free(obj_to_add);
+		perror("ft_nm: add_node_obj");
+		file->hdr_opt |= ERROR;
+		return ;
+	}
+	ft_lstadd_back(&file->objlst, temp);
+}
+
+void    displayLstObj(t_list **begin)
+{
+	t_obj   *obj;
+	t_list  *tmp;
+
+	tmp = *begin;
+	while (tmp)
+	{
+		obj = (t_obj *)tmp->content;
+		ft_printf("%s %s %s\n", obj->value, obj->type, obj->name);
+		tmp = tmp->next;
+	}
+}
+
+static int  cmpR(const char *s1, const char *s2)
+{
+	int res = ft_strcmp(s1, s2);
+	if (res > 0)
+		return (-1);
+	else if (res < 0)
+		return (1);
+	else
+		return (0);
+}
+
+void    displayLstObjR(t_list **begin)
+{
+	lstsort(begin, cmpR);
+	displayLstObj(begin);
+}
+
+void    displayLstObjS(t_list **begin)
+{
+	lstsort(begin, ft_strcmp);
+	displayLstObj(begin);
+}
+
 void    printEhdr32(const t_file *file, const uint8_t *map)
 {
 	Elf32_Ehdr  *ehdr32 = NULL;

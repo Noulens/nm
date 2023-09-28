@@ -19,6 +19,29 @@ char    put_symbol64(const Elf64_Sym *symtab)
 	return ('?');
 }
 
+void printDymSym(const Elf64_Sym *dynsym, uint64_t dynsym_size, char *dynstr, char *symname)
+{
+	ft_printf ("\n# .dynsym entries:\n");
+	for (uint64_t i = 0; i < (dynsym_size / sizeof(Elf64_Sym)); i++)
+	{
+		if (dynsym[i].st_value == 0)
+		{
+			ft_printf("%s ", NULL_PAD);
+		}
+		else
+		{
+			char    buffer[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};;
+			hex(buffer, dynsym[i].st_value);
+			ft_printf("%s ", buffer);
+		}
+		symname = &dynstr[dynsym[i].st_name];
+		if (*symname == '\x00')
+			ft_printf("NULL\n");
+		else
+			ft_printf("%s\n", symname);
+	}
+}
+
 void    parseSymbols64(t_file *file, uint8_t *map)
 {
 	Elf64_Ehdr      *ehdr = (Elf64_Ehdr *)map;
@@ -30,6 +53,9 @@ void    parseSymbols64(t_file *file, uint8_t *map)
 	Elf64_Sym       *dynsym = NULL;
 	uint64_t        dynsym_size = 0;
 	char            *dynstr = NULL;
+	char            *value = NULL;
+	char            *type = NULL;
+	char            *symname = NULL;
 
 	ft_printf("Sections containing symbols:\n");
 	for (size_t i = 0; i < ehdr->e_shnum; i++)
@@ -75,44 +101,8 @@ void    parseSymbols64(t_file *file, uint8_t *map)
 			ft_printf("%s shdr @ 0x%x\n", section_name, sht[i].sh_offset);
 		}
 	}
-	char    *value = NULL;
-	char    *type = NULL;
-	ft_printf ("\n# .dynsym entries:\n");
-	for (uint64_t i = 0; i < (dynsym_size / sizeof(Elf64_Sym)); i++)
-	{
-		if (dynsym[i].st_value == 0)
-		{
-			value = ft_strdup(NULL_PAD" ");
-			if (!value)
-			{
-				file->hdr_opt |= ERROR;
-				ft_fprintf(2, "ft_nm: parseSymbols64: %s", strerror(errno));
-				return ;
-			}
-		}
-		else
-		{
-			char    buffer[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};;
-			hex(buffer, dynsym[i].st_value);
-			value = ft_strdup(buffer);
-			if (!value)
-			{
-				file->hdr_opt |= ERROR;
-				ft_fprintf(2, "ft_nm: parseSymbols64: %s", strerror(errno));
-				return ;
-			}
-		}
-		ft_printf("%s ", value);
-		free(value);
-		value = NULL;
-		char  *symname = ft_strdup(&dynstr[dynsym[i].st_name]);
-		if (*symname == '\x00')
-			ft_printf("NULL\n");
-		else
-			ft_printf("%s\n", symname);
-		free(symname);
-		symname = NULL;
-	}
+	// TODO: remove printDymSym
+	printDymSym(dynsym, dynsym_size, dynstr, symname);
 	ft_printf ("\n# .symtab entries:\n");
 	for (uint64_t i = 0; i < (symtab_size / sizeof(Elf64_Sym)); i++)
 	{
@@ -138,9 +128,6 @@ void    parseSymbols64(t_file *file, uint8_t *map)
 				return ;
 			}
 		}
-		ft_printf("%s ", value);
-		free(value);
-		value = NULL;
 		type = ft_strdup(" ");
 		if (!type)
 		{
@@ -149,16 +136,27 @@ void    parseSymbols64(t_file *file, uint8_t *map)
 			return ;
 		}
 		type[0] = put_symbol64(&symtab[i]);
-		ft_printf("%s ", type);
-		free(type);
-		type = NULL;
-		char  *symname = ft_strdup(&symstr[symtab[i].st_name]);
-		if (*symname == '\x00')
-			ft_printf("NULL\n");
+		if (symstr[symtab[i].st_name] == '\x00')
+			symname = ft_strdup("NULL");
 		else
-			ft_printf("%s\n", symname);
-		free(symname);
-		symname = NULL;
+			symname = ft_strdup(&symstr[symtab[i].st_name]);
+		if (!symname)
+		{
+			file->hdr_opt |= ERROR;
+			ft_fprintf(2, "ft_nm: parseSymbols64: %s", strerror(errno));
+			return ;
+		}
+		add_node_obj(file, value, type, symname);
+		if (file->hdr_opt & ERROR)
+		{
+			ft_fprintf(2, "ft_nm: parseSymbols64: %s", strerror(errno));
+			return ;
+		}
 	}
-	(void)file;
+	if (file->hdr_opt & P)
+		displayLstObj(&file->objlst);
+	else if (file->hdr_opt & R)
+		displayLstObjR(&file->objlst);
+	else
+		displayLstObjS(&file->objlst);
 }

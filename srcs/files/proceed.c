@@ -176,6 +176,7 @@ void    proceed(t_args *args)
 		if (!(file->hdr_opt & ERROR))
 		{
 			mapping(file, &sb, &map);
+			free_list_obj(&file->objlst);
 			if (map != MAP_FAILED && munmap(map, sb.st_size) < 0)
 				ft_fprintf(STDERR_FILENO, SYS_ERR"\n", "munmap", strerror(errno));
 		}
