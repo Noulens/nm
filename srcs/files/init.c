@@ -20,9 +20,9 @@ t_args  init_args()
 	}
 }
 
-t_file  init_file(char *ptr)
+t_file  init_file(char *ptr, int opt)
 {
-	return ((t_file){ptr, -1, 0, 0});
+	return ((t_file){ptr, -1, opt, 0});
 }
 
 static void    add_node(t_args *args, const char *path)
@@ -46,7 +46,7 @@ static void    add_node(t_args *args, const char *path)
 		perror("ft_nm: add_node");
 		exit(1);
 	}
-	*file_to_add = init_file(ptr);
+	*file_to_add = init_file(ptr, args->flags);
 	temp = ft_lstnew((void *)file_to_add);
 	if (!temp)
 	{

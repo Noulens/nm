@@ -10,16 +10,17 @@ BUILDIR		=	build
 
 SRCS_DIR	=	$(sort $(dir $(wildcard ./srcs/*/)))
 
-SRCS		=	$(addprefix srcs/,					\
-										main.c		\
-					$(addprefix files/,	free.c		\
-										proceed.c	\
-										init.c		\
-										display_32.c\
-										display_64.c\
-										tools.c		\
-					)								\
-				)
+SRCS		=	$(addprefix srcs/,						\
+										main.c			\
+					$(addprefix files/,	free.c			\
+										proceed.c		\
+										init.c			\
+										display_32.c	\
+										display_64.c	\
+										conversion.c	\
+										display_tools.c	\
+										)				\
+					)
 
 OBJ			=	$(SRCS:%.c=$(BUILDIR)/%.o)
 

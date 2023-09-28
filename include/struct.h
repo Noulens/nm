@@ -62,7 +62,7 @@ typedef struct s_file
 
 typedef struct s_args
 {
-	u_int8_t    flags;
+	int         flags;
 	int         endianness;
 	int         fds;
 	t_list      *fl;

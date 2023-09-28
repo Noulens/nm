@@ -22,7 +22,7 @@ void    hex(char *str, unsigned long nbr)
 	i = 0;
 	if (nbr == 0)
 	{
-		str[0] = '0';
+		ft_memset(str, '0', 16);
 		return ;
 	}
 	while (nbr)
@@ -31,7 +31,9 @@ void    hex(char *str, unsigned long nbr)
 		++i;
 		nbr /= 16;
 	}
-	count = 0;
+	count = 16 - (int)ft_strlen(addr_digit);
+	for (int j = 0; j < count; j++)
+		str[j] = '0';
 	while (--i >= 0)
 		str[count++] = addr_digit[i];
 }

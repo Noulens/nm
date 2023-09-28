@@ -14,7 +14,7 @@ static int check_size(t_file *file, int arch)
 	return (0);
 }
 
-static void parseElfHeader(t_file *file, uint8_t *map)
+void parseElfHeader(t_file *file, uint8_t *map)
 {
 	if (file->hdr_opt & B64)
 	{
@@ -26,7 +26,7 @@ static void parseElfHeader(t_file *file, uint8_t *map)
 	}
 }
 
-static void parseElfSection(t_file *file, uint8_t *map)
+void parseElfSection(t_file *file, uint8_t *map)
 {
     if (file->hdr_opt & B64)
     {
@@ -38,7 +38,7 @@ static void parseElfSection(t_file *file, uint8_t *map)
     }
 }
 
-static void parseElfProgram(t_file *file, uint8_t *map)
+void parseElfProgram(t_file *file, uint8_t *map)
 {
 	if (file->hdr_opt & B64)
 	{
