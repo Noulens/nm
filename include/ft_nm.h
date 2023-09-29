@@ -39,7 +39,7 @@ void    check_args(int ac, char **av, t_args *args);
 void    free_list(t_list **begin);
 void    free_list_obj(t_list **begin);
 void    proceed(t_args *args);
-void    printEhdr64(const t_file *file, const uint8_t *map);
+void    printEhdr64(t_file *file, const uint8_t *map);
 void    printEhdr32(const t_file *file, const uint8_t *map);
 void    printSht64(const t_file *file, const uint8_t *map);
 void    printSht32(const t_file *file, const uint8_t *map);

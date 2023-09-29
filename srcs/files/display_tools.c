@@ -306,7 +306,7 @@ void    printPhdr32(t_file *file, uint8_t *map)
 	(void)file;
 }
 
-void    printEhdr64(const t_file *file, const uint8_t *map)
+void    printEhdr64(t_file *file, const uint8_t *map)
 {
 	Elf64_Ehdr  *ehdr64 = NULL;
 

@@ -4,11 +4,13 @@
 
 #include "ft_nm.h"
 
-static int check_size(t_file *file, int arch)
+static int check_size(t_file *file, int arch, Elf64_Ehdr *ehdr64)
 {
 	if (((arch & B64) && file->size < sizeof(Elf64_Ehdr))
-		|| ((arch & B32) && file->size < sizeof(Elf32_Ehdr)))
+		|| ((arch & B32) && file->size < sizeof(Elf32_Ehdr))
+        || ehdr64->e_shoff + (ehdr64->e_shentsize * ehdr64->e_shnum) > file->size)
 	{
+        ft_fprintf(2, "ft_nm: %s: file too short\n", file->path);
 		return (-1);
 	}
 	return (0);
@@ -52,6 +54,9 @@ void parseElfProgram(t_file *file, uint8_t *map)
 
 static void  check_magic(t_file *file, uint8_t *map)
 {
+    Elf64_Ehdr  *ehdr64 = NULL;
+
+    ehdr64 = (Elf64_Ehdr *)map;
 	if (ft_strncmp((char *)map, ELFMAG, 4) == 0)
 	{
 		switch (map[4])
@@ -65,7 +70,7 @@ static void  check_magic(t_file *file, uint8_t *map)
 			default:
 				file->hdr_opt |= ERROR;
 		}
-		if (check_size(file, file->hdr_opt))
+		if (check_size(file, file->hdr_opt, ehdr64))
 			file->hdr_opt |= ERROR;
 		switch (map[5])
 		{

@@ -17,7 +17,7 @@ void    hex(char *str, unsigned long nbr)
 {
 	int				i;
 	int				count;
-	char			addr_digit[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};;
+	char			addr_digit[17] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};;
 
 	i = 0;
 	if (nbr == 0)

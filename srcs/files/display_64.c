@@ -106,7 +106,7 @@ void    parseSymbols64(t_file *file, uint8_t *map)
 	ft_printf ("\n# .symtab entries:\n");
 	for (uint64_t i = 0; i < (symtab_size / sizeof(Elf64_Sym)); i++)
 	{
-		if (symtab[i].st_value == 0)
+		if (symtab[i].st_value == '\x00')
 		{
 			value = ft_strdup(NULL_PAD);
 			if (!value)
@@ -118,7 +118,7 @@ void    parseSymbols64(t_file *file, uint8_t *map)
 		}
 		else
 		{
-			char    buffer[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+			char    buffer[17] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0};
 			hex(buffer, symtab[i].st_value);
 			value = ft_strdup(buffer);
 			if (!value)
