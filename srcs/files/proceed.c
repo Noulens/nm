@@ -175,6 +175,7 @@ void    proceed(t_args *args)
 	while (tmp)
 	{
 		file = (t_file *)tmp->content;
+        file->hdr_opt |= args->flags;
 		if (args->fds > 1)
 			ft_printf("%s:\n", file->path);
 		stating(file, &sb);

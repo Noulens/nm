@@ -20,9 +20,9 @@ t_args  init_args()
 	}
 }
 
-t_file  init_file(char *ptr, int opt)
+t_file  init_file(char *ptr)
 {
-	return ((t_file){ptr, -1, opt, 0, NULL});
+	return ((t_file){ptr, -1, 0, 0, NULL});
 }
 
 static void    add_node(t_args *args, const char *path)
@@ -46,7 +46,7 @@ static void    add_node(t_args *args, const char *path)
 		perror("ft_nm: add_node");
 		exit(1);
 	}
-	*file_to_add = init_file(ptr, args->flags);
+	*file_to_add = init_file(ptr);
 	temp = ft_lstnew((void *)file_to_add);
 	if (!temp)
 	{
@@ -63,23 +63,22 @@ static void    add_node(t_args *args, const char *path)
 void    check_args(int ac, char **av, t_args *args)
 {
 	size_t  len = 0;
-    char    **ptr = av;
 
-	++ptr;
+	++av;
 	if (ac == 1)
 	{
 		add_node(args, "./a.out");
 		return ;
 	}
-	len = ft_ptrlen((const char **)ptr);
+	len = ft_ptrlen((const char **) av);
 	while (len--)
 	{
-		if (**ptr == '-')
+		if (**av == '-')
 		{
-			++*ptr;
-			while (**ptr)
+			++*av;
+			while (**av)
 			{
-				switch (**ptr)
+				switch (**av)
 				{
 					case 'a':
 						args->flags |= A;
@@ -97,24 +96,17 @@ void    check_args(int ac, char **av, t_args *args)
 						args->flags |= U;
 						break;
 					default:
-						ft_fprintf(2, INVALID_OPT, **ptr);
+						ft_fprintf(2, INVALID_OPT, **av);
 						free_list(&args->fl);
 						exit(1);
 				}
-				++*ptr;
+				++*av;
 			}
 		}
-		++ptr;
+		else
+			add_node(args, *av);
+		++av;
 	}
-    len = ft_ptrlen((const char **)av);
-    ptr = av;
-    while (len--)
-    {
-        if (**ptr == '-')
-            ++ptr;
-        else
-            add_node(args, *ptr);
-    }
 	if (!args->fds)
 		add_node(args, "./a.out");
 }
