@@ -156,7 +156,7 @@ void    parseSymbols64(t_file *file, uint8_t *map)
 	if (file->hdr_opt & P)
 		displayLstObj(&file->objlst);
 	else if (file->hdr_opt & R)
-		displayLstObjR(&file->objlst);
+        displayLstObjR(&file->objlst);
 	else
 		displayLstObjS(&file->objlst);
 }

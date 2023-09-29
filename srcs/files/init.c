@@ -63,22 +63,23 @@ static void    add_node(t_args *args, const char *path)
 void    check_args(int ac, char **av, t_args *args)
 {
 	size_t  len = 0;
+    char    **ptr = av;
 
-	++av;
+	++ptr;
 	if (ac == 1)
 	{
 		add_node(args, "./a.out");
 		return ;
 	}
-	len = ft_ptrlen((const char **) av);
+	len = ft_ptrlen((const char **)ptr);
 	while (len--)
 	{
-		if (**av == '-')
+		if (**ptr == '-')
 		{
-			++*av;
-			while (**av)
+			++*ptr;
+			while (**ptr)
 			{
-				switch (**av)
+				switch (**ptr)
 				{
 					case 'a':
 						args->flags |= A;
@@ -96,17 +97,24 @@ void    check_args(int ac, char **av, t_args *args)
 						args->flags |= U;
 						break;
 					default:
-						ft_fprintf(2, INVALID_OPT, **av);
+						ft_fprintf(2, INVALID_OPT, **ptr);
 						free_list(&args->fl);
 						exit(1);
 				}
-				++*av;
+				++*ptr;
 			}
 		}
-		else
-			add_node(args, *av);
-		++av;
+		++ptr;
 	}
+    len = ft_ptrlen((const char **)av);
+    ptr = av;
+    while (len--)
+    {
+        if (**ptr == '-')
+            ++ptr;
+        else
+            add_node(args, *ptr);
+    }
 	if (!args->fds)
 		add_node(args, "./a.out");
 }
