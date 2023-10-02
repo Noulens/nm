@@ -73,7 +73,11 @@ void    check_args(int ac, char **av, t_args *args)
 	len = ft_ptrlen((const char **) av);
 	while (len--)
 	{
-		if (**av == '-')
+        if (!ft_strncmp(*av, "--verbose", 10))
+        {
+            args->flags |= V;
+        }
+        else if (**av == '-')
 		{
 			++*av;
 			while (**av)
@@ -96,14 +100,14 @@ void    check_args(int ac, char **av, t_args *args)
 						args->flags |= U;
 						break;
 					default:
-						ft_fprintf(2, INVALID_OPT, **av);
-						free_list(&args->fl);
-						exit(1);
+                            ft_fprintf(2, INVALID_OPT, **av);
+                            free_list(&args->fl);
+                            exit(1);
 				}
 				++*av;
 			}
 		}
-		else
+        else
 			add_node(args, *av);
 		++av;
 	}

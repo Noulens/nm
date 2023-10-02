@@ -156,9 +156,12 @@ static void mapping(t_file *file, struct stat *sb, uint8_t **map)
 		ft_fprintf(STDERR_FILENO, NOT_ELF"\n", file->path);
 		return ;
 	}
-	parseElfHeader(file, *map);
-    parseElfSection(file, *map);
-	parseElfProgram(file, *map);
+    if (file->hdr_opt & V)
+    {
+        parseElfHeader(file, *map);
+        parseElfSection(file, *map);
+        parseElfProgram(file, *map);
+    }
 	if (file->hdr_opt & B64)
 		parseSymbols64(file, *map);
 	else

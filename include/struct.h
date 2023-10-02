@@ -18,6 +18,7 @@ typedef enum e_options
 	P = 0b00100,
 	R = 0b01000,
 	U = 0b10000,
+    V = 0b10000000000
 }   t_opt;
 
 typedef enum e_objs
