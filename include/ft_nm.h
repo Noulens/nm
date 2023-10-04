@@ -51,5 +51,6 @@ void    hex(char *str, unsigned long nbr);
 void    displayLstObj(t_list **begin);
 void    displayLstObjR(t_list **begin);
 void    displayLstObjS(t_list **begin);
+uint16_t    readHalf(uint16_t data, int opt);
 
 #endif //FT_NM_H

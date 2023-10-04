@@ -54,7 +54,7 @@ void parseElfProgram(t_file *file, uint8_t *map)
 
 static void  check_magic(t_file *file, uint8_t *map)
 {
-    Elf64_Ehdr  *ehdr64 = NULL;
+    Elf64_Ehdr      *ehdr64 = NULL;
 
     ehdr64 = (Elf64_Ehdr *)map;
 	if (ft_strncmp((char *)map, ELFMAG, 4) == 0)
@@ -82,6 +82,23 @@ static void  check_magic(t_file *file, uint8_t *map)
 				break ;
 			default:
 				file->hdr_opt |= ERROR;
+		}
+		// Check the ELF class (32-bit or 64-bit)
+		if (ehdr64->e_ident[EI_CLASS] != ELFCLASS64) {
+			file->hdr_opt |= ERROR;
+			return;
+		}
+
+		// Check the ELF data encoding (little-endian or big-endian)
+		if (ehdr64->e_ident[EI_DATA] != ELFDATA2LSB) {
+			file->hdr_opt |= ERROR;
+			return;
+		}
+
+		// Check the ELF version
+		if (ehdr64->e_ident[EI_VERSION] != EV_CURRENT) {
+			file->hdr_opt |= ERROR;
+			return;
 		}
 	}
 	else
@@ -179,6 +196,7 @@ void    proceed(t_args *args)
 	{
 		file = (t_file *)tmp->content;
         file->hdr_opt |= args->flags;
+        file->hdr_opt |= args->endianness;
 		if (args->fds > 1)
 			ft_printf("%s:\n", file->path);
 		stating(file, &sb);

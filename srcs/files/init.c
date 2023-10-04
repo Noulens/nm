@@ -10,9 +10,9 @@ t_args  init_args()
 
 	data.i = 0x01020304;
 	if (data.bytes[0] == 0x01)
-		return ((t_args){0, BEND,0, NULL, 0});
+		return ((t_args){0, 0,0, NULL, 0});
 	else if (data.bytes[0] == 0x04)
-		return ((t_args){0, LEND,0, NULL, 0});
+		return ((t_args){0, L_ARCH,0, NULL, 0});
 	else
 	{
 		ft_fprintf(2, "ft_nm: init_args: Unknown endianness\n");

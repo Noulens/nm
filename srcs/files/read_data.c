@@ -8,7 +8,7 @@ uint16_t    readHalf(const uint16_t data, const int opt)
 {
     uint16_t    res = data;
 
-    if (opt & BEND)
+    if (((opt & LEND) && !(opt & L_ARCH)) || ((opt & BEND) && (opt & L_ARCH)))
         reverseEndianness(&res, sizeof(uint16_t));
     return (res);
 }

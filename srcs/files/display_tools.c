@@ -320,7 +320,7 @@ void    printEhdr64(t_file *file, const uint8_t *map)
 	ft_printf("\n");
 	ft_printf("%s ", "e_type (Object file type):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_type (Object file type):"));
-	ft_printf("%d\n", ehdr64->e_type);
+	ft_printf("%d\n", readHalf(ehdr64->e_type, file->hdr_opt));
 	ft_printf("%s ", "e_machine (Architecture):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_machine (Architecture):"));
 	ft_printf("%d\n", ehdr64->e_machine);

@@ -7,7 +7,7 @@
 
 typedef union u_check_endian
 {
-	int     i;
+	unsigned long     i;
 	char    bytes[4];
 }   t_check_endian;
 
@@ -51,7 +51,8 @@ typedef enum e_hdr
 	BEND =      0b1000000,
 	B32 =       0b10000000,
 	B64 =    0b100000000,
-	ERROR =     0b1000000000
+	ERROR =     0b1000000000,
+    L_ARCH = 0b100000000000
 }   t_hdr;
 
 typedef struct s_file
