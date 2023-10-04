@@ -97,7 +97,6 @@ void    printEhdr32(const t_file *file, const uint8_t *map)
 {
 	Elf32_Ehdr  *ehdr32 = NULL;
 
-	(void)file;
 	ehdr32 = (Elf32_Ehdr *)map;
 	ft_printf("e_ident (Magic number): ");
 	for (int i = 0; i < 16; i++)
@@ -107,60 +106,60 @@ void    printEhdr32(const t_file *file, const uint8_t *map)
 	ft_printf("\n");
 	ft_printf("%s ", "e_type (Object file type):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_type (Object file type):"));
-	ft_printf("%d\n", ehdr32->e_type);
+	ft_printf("%d\n", readHalf(ehdr32->e_type, file->hdr_opt));
 	ft_printf("%s ", "e_machine (Architecture):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_machine (Architecture):"));
-	ft_printf("%d\n", ehdr32->e_machine);
+	ft_printf("%d\n", readHalf(ehdr32->e_machine, file->hdr_opt));
 	ft_printf("%s ", "e_version (Object file version):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_version (Object file version):"));
-	ft_printf("%d\n", ehdr32->e_version);
+	ft_printf("%d\n", readWord(ehdr32->e_version, file->hdr_opt));
 	ft_printf("%s ", "e_entry (Entry point virtual address):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_entry (Entry point virtual address):"));
-	ft_printf("0x%X\n", (unsigned long)ehdr32->e_entry);
+	ft_printf("0x%X\n", readWord((unsigned long)ehdr32->e_entry, file->hdr_opt));
 	ft_printf("%s ", "e_entry (Entry point virtual address):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_entry (Entry point virtual address):"));
-	ft_printf("%ld\n", (unsigned long)ehdr32->e_phoff);
+	ft_printf("%ld\n", readWord((unsigned long)ehdr32->e_phoff, file->hdr_opt));
 	ft_printf("%s ", "e_shoff (Section header table file offset):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_shoff (Section header table file offset):"));
-	ft_printf("%ld\n", (unsigned long)ehdr32->e_shoff);
+	ft_printf("%ld\n", readWord((unsigned long)ehdr32->e_shoff, file->hdr_opt));
 	ft_printf("%s ", "e_flags (Processor-specific flags):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_flags (Processor-specific flags):"));
-	ft_printf("0x%X\n", ehdr32->e_flags);
+	ft_printf("0x%X\n", readWord(ehdr32->e_flags, file->hdr_opt));
 	ft_printf("%s ", "e_ehsize (ELF header size in bytes):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_ehsize (ELF header size in bytes):"));
-	ft_printf("%d\n", ehdr32->e_ehsize);
+	ft_printf("%d\n", readHalf(ehdr32->e_ehsize, file->hdr_opt));
 	ft_printf("%s ", "e_phentsize (Program header table entry size):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_phentsize (Program header table entry size):"));
-	ft_printf("%d\n", ehdr32->e_phentsize);
+	ft_printf("%d\n", readHalf(ehdr32->e_phentsize, file->hdr_opt));
 	ft_printf("%s ", "e_phnum (Program header table entry count):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_phnum (Program header table entry count):"));
-	ft_printf("%d\n", ehdr32->e_phnum);
+	ft_printf("%d\n", readHalf(ehdr32->e_phnum, file->hdr_opt));
 	ft_printf("%s ", "e_shentsize (Section header table entry size):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_shentsize (Section header table entry size):"));
-	ft_printf("%d\n", ehdr32->e_shentsize);
+	ft_printf("%d\n", readHalf(ehdr32->e_shentsize, file->hdr_opt));
 	ft_printf("%s ", "e_shnum (Section header table entry count):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_shnum (Section header table entry count):"));
-	ft_printf("%d\n", ehdr32->e_shnum);
+	ft_printf("%d\n", readHalf(ehdr32->e_shnum, file->hdr_opt));
 	ft_printf("%s ", "e_shstrndx (Section header string table index):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_shstrndx (Section header string table index):"));
-	ft_printf("%d\n", ehdr32->e_shstrndx);
+	ft_printf("%d\n", readHalf(ehdr32->e_shstrndx, file->hdr_opt));
 }
 
 void    printSht32(const t_file *file, const uint8_t *map)
 {
 	Elf32_Ehdr          *ehdr = (Elf32_Ehdr *)map;
-	Elf32_Shdr          *sht = (Elf32_Shdr *)&map[ehdr->e_shoff];
-	const uint8_t       *shstr = &map[sht[ehdr->e_shstrndx].sh_offset];
+	Elf32_Shdr          *sht = (Elf32_Shdr *)&map[readWord(ehdr->e_shoff, file->hdr_opt)];
+	const uint8_t       *shstr = &map[readWord(sht[readHalf(ehdr->e_shstrndx, file->hdr_opt)].sh_offset, file->hdr_opt)];
 	int                 len;
 
 	ft_printf("\nSection header string tab, first string is  NULL: '%s'\n", shstr);
 	write(1, SPACE, PADDING_SHT);
 	ft_printf("type\tsize\tflags\taddress\n");
-	for (int i = 0; i < ehdr->e_shnum; i++)
+	for (int i = 0; i < readHalf(ehdr->e_shnum, file->hdr_opt); i++)
 	{
-		len = ft_printf("[%d] %s ", i, &shstr[sht[i].sh_name]);
+		len = ft_printf("[%d] %s ", i, &(shstr[readWord(sht[i].sh_name, file->hdr_opt)]));
 		write(1, SPACE, PADDING_SHT - (len > 30 ? 0 : len));
-		switch (sht[i].sh_type)
+		switch (readWord(sht[i].sh_type, file->hdr_opt))
 		{
 			case SHT_NULL: 		ft_printf("NULL");
 				break;
@@ -205,36 +204,35 @@ void    printSht32(const t_file *file, const uint8_t *map)
 			default:			ft_printf("Unknown");
 				break;
 		}
-		ft_printf("\t0x%x\t", sht[i].sh_size);
-		if (sht[i].sh_flags & SHF_WRITE)
+		ft_printf("\t0x%x\t", readWord(sht[i].sh_size, file->hdr_opt));
+		if (readWord(sht[i].sh_flags, file->hdr_opt) & SHF_WRITE)
 			ft_printf("W");
-		if (sht[i].sh_flags & SHF_ALLOC)
+		if (readWord(sht[i].sh_flags, file->hdr_opt) & SHF_ALLOC)
 			ft_printf("A");
-		if (sht[i].sh_flags & SHF_EXECINSTR)
+		if (readWord(sht[i].sh_flags, file->hdr_opt) & SHF_EXECINSTR)
 			ft_printf("X");
-		if (sht[i].sh_flags & SHF_MERGE)
+		if (readWord(sht[i].sh_flags, file->hdr_opt) & SHF_MERGE)
 			ft_printf("M");
-		else if (sht[i].sh_flags)
+		else if (readWord(sht[i].sh_flags, file->hdr_opt))
 			ft_printf("+");
 		else
 			ft_printf("nof");
-		ft_printf("\t0x%X", sht[i].sh_addr);
+		ft_printf("\t0x%X", readWord(sht[i].sh_addr, file->hdr_opt));
 		ft_putchar_fd('\n', 1);
 	}
-	(void)file;
 }
 
 void    printPhdr32(t_file *file, uint8_t *map)
 {
 	Elf32_Ehdr  *ehdr = (Elf32_Ehdr *)map;
-	Elf32_Phdr  *phdr = (Elf32_Phdr *)&map[ehdr->e_phoff];
+	Elf32_Phdr  *phdr = (Elf32_Phdr *)&map[readWord(ehdr->e_phoff, file->hdr_opt)];
 
 	ft_printf("\nProgram Headers\n");
 	ft_printf("Type"SPACE_PHDR"Offset\tVirtAd\tPhysAd\tFileSiz\tMemSiz\tAlign\tFlg\n\n");
-	for (int i = 0; i < ehdr->e_phnum; i++)
+	for (int i = 0; i < readHalf(ehdr->e_phnum, file->hdr_opt); i++)
 	{
 		int len;
-		switch (phdr[i].p_type)
+		switch (readWord(phdr[i].p_type, file->hdr_opt))
 		{
 			case PT_NULL:
 				len = ft_printf("NULL");
@@ -290,27 +288,25 @@ void    printPhdr32(t_file *file, uint8_t *map)
 		}
 		write(1, SPACE, PADDING_PHDR - (len > 30 ? 0 : len));
 		ft_printf("\t0x%x\t0x%x\t0x%x\t0x%x\t0x%x\t0x%x\t",
-		          phdr[i].p_offset, phdr[i].p_vaddr, phdr[i].p_paddr,
-		          phdr[i].p_filesz, phdr[i].p_memsz, phdr[i].p_align);
-		if (phdr[i].p_flags & PF_X)
+		          readWord(phdr[i].p_offset, file->hdr_opt), readWord(phdr[i].p_vaddr, file->hdr_opt), readWord(phdr[i].p_paddr, file->hdr_opt),
+		          readWord(phdr[i].p_filesz, file->hdr_opt), readWord(phdr[i].p_memsz, file->hdr_opt), readWord(phdr[i].p_align, file->hdr_opt));
+		if (readWord(phdr[i].p_flags, file->hdr_opt) & PF_X)
 			ft_printf("%s", "E");
-		if (phdr[i].p_flags & PF_W)
+		if (readWord(phdr[i].p_flags, file->hdr_opt) & PF_W)
 			ft_printf("%s", "W");
-		if (phdr[i].p_flags & PF_R)
+		if (readWord(phdr[i].p_flags, file->hdr_opt) & PF_R)
 			ft_printf("%s", "R");
 		else
 			ft_printf("%s", "nof");
 		ft_putchar_fd('\n', 1);
 	}
 	ft_putchar_fd('\n', 1);
-	(void)file;
 }
 
 void    printEhdr64(t_file *file, const uint8_t *map)
 {
 	Elf64_Ehdr  *ehdr64 = NULL;
 
-	(void)file;
 	ehdr64 = (Elf64_Ehdr *)map;
 	ft_printf("e_ident (Magic number): ");
 	for (int i = 0; i < 16; i++)
@@ -323,57 +319,57 @@ void    printEhdr64(t_file *file, const uint8_t *map)
 	ft_printf("%d\n", readHalf(ehdr64->e_type, file->hdr_opt));
 	ft_printf("%s ", "e_machine (Architecture):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_machine (Architecture):"));
-	ft_printf("%d\n", ehdr64->e_machine);
+	ft_printf("%d\n", readHalf(ehdr64->e_machine, file->hdr_opt));
 	ft_printf("%s ", "e_version (Object file version):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_version (Object file version):"));
-	ft_printf("%d\n", ehdr64->e_version);
+	ft_printf("%d\n", readWord(ehdr64->e_version, file->hdr_opt));
 	ft_printf("%s ", "e_entry (Entry point virtual address):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_entry (Entry point virtual address):"));
-	ft_printf("0x%X\n", (unsigned long)ehdr64->e_entry);
-	ft_printf("%s ", "e_phoff (Program header table file offset):");
-	write(1, SPACE, PADDING_EHDR - ft_strlen("e_phoff (Program header table file offset):"));
-	ft_printf("%ld\n", (unsigned long)ehdr64->e_phoff);
+	ft_printf("0x%X\n", readWord((unsigned long)ehdr64->e_entry, file->hdr_opt));
+	ft_printf("%s ", "e_entry (Entry point virtual address):");
+	write(1, SPACE, PADDING_EHDR - ft_strlen("e_entry (Entry point virtual address):"));
+	ft_printf("%ld\n", readWord((unsigned long)ehdr64->e_phoff, file->hdr_opt));
 	ft_printf("%s ", "e_shoff (Section header table file offset):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_shoff (Section header table file offset):"));
-	ft_printf("%ld\n", (unsigned long)ehdr64->e_shoff);
+	ft_printf("%ld\n", readWord((unsigned long)ehdr64->e_shoff, file->hdr_opt));
 	ft_printf("%s ", "e_flags (Processor-specific flags):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_flags (Processor-specific flags):"));
-	ft_printf("0x%X\n", ehdr64->e_flags);
+	ft_printf("0x%X\n", readWord(ehdr64->e_flags, file->hdr_opt));
 	ft_printf("%s ", "e_ehsize (ELF header size in bytes):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_ehsize (ELF header size in bytes):"));
-	ft_printf("%d\n", ehdr64->e_ehsize);
+	ft_printf("%d\n", readHalf(ehdr64->e_ehsize, file->hdr_opt));
 	ft_printf("%s ", "e_phentsize (Program header table entry size):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_phentsize (Program header table entry size):"));
-	ft_printf("%d\n", ehdr64->e_phentsize);
+	ft_printf("%d\n", readHalf(ehdr64->e_phentsize, file->hdr_opt));
 	ft_printf("%s ", "e_phnum (Program header table entry count):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_phnum (Program header table entry count):"));
-	ft_printf("%d\n", ehdr64->e_phnum);
+	ft_printf("%d\n", readHalf(ehdr64->e_phnum, file->hdr_opt));
 	ft_printf("%s ", "e_shentsize (Section header table entry size):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_shentsize (Section header table entry size):"));
-	ft_printf("%d\n", ehdr64->e_shentsize);
+	ft_printf("%d\n", readHalf(ehdr64->e_shentsize, file->hdr_opt));
 	ft_printf("%s ", "e_shnum (Section header table entry count):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_shnum (Section header table entry count):"));
-	ft_printf("%d\n", ehdr64->e_shnum);
+	ft_printf("%d\n", readHalf(ehdr64->e_shnum, file->hdr_opt));
 	ft_printf("%s ", "e_shstrndx (Section header string table index):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_shstrndx (Section header string table index):"));
-	ft_printf("%d\n", ehdr64->e_shstrndx);
+	ft_printf("%d\n", readHalf(ehdr64->e_shstrndx, file->hdr_opt));
 }
 
 void    printSht64(const t_file *file, const uint8_t *map)
 {
 	Elf64_Ehdr          *ehdr = (Elf64_Ehdr *)map;
-	Elf64_Shdr          *sht = (Elf64_Shdr *)&map[ehdr->e_shoff];
-	const uint8_t       *shstr = &map[sht[ehdr->e_shstrndx].sh_offset];
+	Elf64_Shdr          *sht = (Elf64_Shdr *)&map[readXWord(ehdr->e_shoff, file->hdr_opt)];
+	const uint8_t       *shstr = &map[readXWord(sht[readHalf(ehdr->e_shstrndx, file->hdr_opt)].sh_offset, file->hdr_opt)];
 	int                 len;
 
 	ft_printf("\nSection header string tab, first string is  NULL: '%s'\n", shstr);
 	write(1, SPACE, PADDING_SHT);
 	ft_printf("type\tsize\tflags\taddress\n");
-	for (int i = 0; i < ehdr->e_shnum; i++)
+	for (int i = 0; i < readHalf(ehdr->e_shnum, file->hdr_opt); i++)
 	{
-		len = ft_printf("[%d] %s ", i, &shstr[sht[i].sh_name]);
+		len = ft_printf("[%d] %s ", i, &(shstr[readWord(sht[i].sh_name, file->hdr_opt)]));
 		write(1, SPACE, PADDING_SHT - (len > 30 ? 0 : len));
-		switch (sht[i].sh_type)
+		switch (readWord(sht[i].sh_type, file->hdr_opt))
 		{
 			case SHT_NULL: 		ft_printf("NULL");
 				break;
@@ -418,36 +414,35 @@ void    printSht64(const t_file *file, const uint8_t *map)
 			default:			ft_printf("Unknown");
 				break;
 		}
-		ft_printf("\t0x%x\t", sht[i].sh_size);
-		if (sht[i].sh_flags & SHF_WRITE)
+		ft_printf("\t0x%x\t", readXWord(sht[i].sh_size, file->hdr_opt));
+		if (readXWord(sht[i].sh_flags, file->hdr_opt) & SHF_WRITE)
 			ft_printf("W");
-		if (sht[i].sh_flags & SHF_ALLOC)
+		if (readXWord(sht[i].sh_flags, file->hdr_opt) & SHF_ALLOC)
 			ft_printf("A");
-		if (sht[i].sh_flags & SHF_EXECINSTR)
+		if (readXWord(sht[i].sh_flags, file->hdr_opt) & SHF_EXECINSTR)
 			ft_printf("X");
-		if (sht[i].sh_flags & SHF_MERGE)
+		if (readXWord(sht[i].sh_flags, file->hdr_opt) & SHF_MERGE)
 			ft_printf("M");
-		else if (sht[i].sh_flags)
+		else if (readXWord(sht[i].sh_flags, file->hdr_opt))
 			ft_printf("+");
 		else
 			ft_printf("nof");
-		ft_printf("\t0x%X", sht[i].sh_addr);
+		ft_printf("\t0x%X", readXWord(sht[i].sh_addr, file->hdr_opt));
 		ft_putchar_fd('\n', 1);
 	}
-	(void)file;
 }
 
 void    printPhdr64(t_file *file, uint8_t *map)
 {
 	Elf64_Ehdr  *ehdr = (Elf64_Ehdr *)map;
-	Elf64_Phdr  *phdr = (Elf64_Phdr *)&map[ehdr->e_phoff];
+	Elf64_Phdr  *phdr = (Elf64_Phdr *)&map[readXWord(ehdr->e_phoff, file->hdr_opt)];
 
 	ft_printf("\nProgram Headers\n");
 	ft_printf("Type"SPACE_PHDR"Offset\tVirtAd\tPhysAd\tFileSiz\tMemSiz\tAlign\tFlg\n\n");
-	for (int i = 0; i < ehdr->e_phnum; i++)
+	for (int i = 0; i < readHalf(ehdr->e_phnum, file->hdr_opt); i++)
 	{
 		int len;
-		switch (phdr[i].p_type)
+		switch (readWord(phdr[i].p_type, file->hdr_opt))
 		{
 			case PT_NULL:
 				len = ft_printf("NULL");
@@ -503,18 +498,17 @@ void    printPhdr64(t_file *file, uint8_t *map)
 		}
 		write(1, SPACE, PADDING_PHDR - (len > 30 ? 0 : len));
 		ft_printf("\t0x%x\t0x%x\t0x%x\t0x%x\t0x%x\t0x%x\t",
-		          phdr[i].p_offset, phdr[i].p_vaddr, phdr[i].p_paddr,
-		          phdr[i].p_filesz, phdr[i].p_memsz, phdr[i].p_align);
-		if (phdr[i].p_flags & PF_X)
+		          readXWord(phdr[i].p_offset, file->hdr_opt), readXWord(phdr[i].p_vaddr, file->hdr_opt), readXWord(phdr[i].p_paddr, file->hdr_opt),
+		          readXWord(phdr[i].p_filesz, file->hdr_opt), readXWord(phdr[i].p_memsz, file->hdr_opt), readXWord(phdr[i].p_align, file->hdr_opt));
+		if (readWord(phdr[i].p_flags, file->hdr_opt) & PF_X)
 			ft_printf("%s", "E");
-		if (phdr[i].p_flags & PF_W)
+		if (readWord(phdr[i].p_flags, file->hdr_opt) & PF_W)
 			ft_printf("%s", "W");
-		if (phdr[i].p_flags & PF_R)
+		if (readWord(phdr[i].p_flags, file->hdr_opt) & PF_R)
 			ft_printf("%s", "R");
 		else
 			ft_printf("%s", "nof");
 		ft_putchar_fd('\n', 1);
 	}
 	ft_putchar_fd('\n', 1);
-	(void)file;
 }

@@ -4,11 +4,21 @@
 
 #include "ft_nm.h"
 
-static int check_size(t_file *file, int arch, Elf64_Ehdr *ehdr64)
+static int check_size32(t_file *file, int arch, Elf32_Ehdr *ehdr32)
+{
+	if ( ((arch & B32) && file->size < sizeof(Elf32_Ehdr))
+	    || readWord(ehdr32->e_shoff, file->hdr_opt) + (readHalf(ehdr32->e_shentsize, file->hdr_opt) * readHalf(ehdr32->e_shnum, file->hdr_opt)) > file->size)
+	{
+		ft_fprintf(2, "ft_nm: %s: file too short\n", file->path);
+		return (-1);
+	}
+	return (0);
+}
+
+static int check_size64(t_file *file, int arch, Elf64_Ehdr *ehdr64)
 {
 	if (((arch & B64) && file->size < sizeof(Elf64_Ehdr))
-		|| ((arch & B32) && file->size < sizeof(Elf32_Ehdr))
-        || ehdr64->e_shoff + (ehdr64->e_shentsize * ehdr64->e_shnum) > file->size)
+        || readXWord(ehdr64->e_shoff, file->hdr_opt) + (readHalf(ehdr64->e_shentsize, file->hdr_opt) * readHalf(ehdr64->e_shnum, file->hdr_opt)) > file->size)
 	{
         ft_fprintf(2, "ft_nm: %s: file too short\n", file->path);
 		return (-1);
@@ -52,54 +62,88 @@ void parseElfProgram(t_file *file, uint8_t *map)
 	}
 }
 
+static void check64(t_file *file, Elf64_Ehdr *ehdr64)
+{
+	int data_encoding = ehdr64->e_ident[EI_DATA];
+	if (data_encoding == ELFDATA2LSB)
+	{
+		file->hdr_opt |= LEND;
+	}
+	else if (data_encoding == ELFDATA2MSB)
+	{
+		file->hdr_opt |= BEND;
+	}
+	else
+	{
+		file->hdr_opt |= ERROR;
+		return ;
+	}
+	if (check_size64(file, file->hdr_opt, ehdr64))
+	{
+		file->hdr_opt |= ERROR;
+		return ;
+	}
+	if (ehdr64->e_ident[EI_CLASS] != ELFCLASS64
+		|| ehdr64->e_ident[EI_VERSION] != EV_CURRENT)
+	{
+		file->hdr_opt |= ERROR;
+		return ;
+	}
+}
+
+static void check32(t_file *file, Elf32_Ehdr *ehdr32)
+{
+	int data_encoding = ehdr32->e_ident[EI_DATA];
+	if (data_encoding == ELFDATA2LSB)
+	{
+		file->hdr_opt |= LEND;
+	}
+	else if (data_encoding == ELFDATA2MSB)
+	{
+		file->hdr_opt |= BEND;
+	}
+	else
+	{
+		file->hdr_opt |= ERROR;
+		return ;
+	}
+	if (check_size32(file, file->hdr_opt, ehdr32))
+	{
+		file->hdr_opt |= ERROR;
+		return ;
+	}
+	if (ehdr32->e_ident[EI_CLASS] != ELFCLASS32
+	    || ehdr32->e_ident[EI_VERSION] != EV_CURRENT)
+	{
+		file->hdr_opt |= ERROR;
+		return ;
+	}
+}
+
 static void  check_magic(t_file *file, uint8_t *map)
 {
     Elf64_Ehdr      *ehdr64 = NULL;
+	Elf32_Ehdr      *ehdr32 = NULL;
 
-    ehdr64 = (Elf64_Ehdr *)map;
+	switch (map[EI_CLASS])
+	{
+		case ELFCLASS32:
+			file->hdr_opt |= B32;
+			ehdr32 = (Elf32_Ehdr *)map;
+			break ;
+		case ELFCLASS64:
+			file->hdr_opt |= B64;
+			ehdr64 = (Elf64_Ehdr *)map;
+			break ;
+		default:
+			file->hdr_opt |= ERROR;
+	}
 	if (ft_strncmp((char *)map, ELFMAG, 4) == 0)
 	{
-		switch (map[4])
-		{
-			case 1:
-				file->hdr_opt |= B32;
-				break ;
-			case 2:
-				file->hdr_opt |= B64;
-				break ;
-			default:
-				file->hdr_opt |= ERROR;
-		}
-		if (check_size(file, file->hdr_opt, ehdr64))
-			file->hdr_opt |= ERROR;
-		switch (map[5])
-		{
-			case 1:
-				file->hdr_opt |= LEND;
-				break ;
-			case 2:
-				file->hdr_opt |= BEND;
-				break ;
-			default:
-				file->hdr_opt |= ERROR;
-		}
-		// Check the ELF class (32-bit or 64-bit)
-		if (ehdr64->e_ident[EI_CLASS] != ELFCLASS64) {
-			file->hdr_opt |= ERROR;
-			return;
-		}
-
-		// Check the ELF data encoding (little-endian or big-endian)
-		if (ehdr64->e_ident[EI_DATA] != ELFDATA2LSB) {
-			file->hdr_opt |= ERROR;
-			return;
-		}
-
-		// Check the ELF version
-		if (ehdr64->e_ident[EI_VERSION] != EV_CURRENT) {
-			file->hdr_opt |= ERROR;
-			return;
-		}
+		if (file->hdr_opt & B32)
+			check32(file, ehdr32);
+		else if (file->hdr_opt & B64)
+			check64(file, ehdr64);
 	}
 	else
 		file->hdr_opt |= ERROR;

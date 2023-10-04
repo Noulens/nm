@@ -52,5 +52,9 @@ void    displayLstObj(t_list **begin);
 void    displayLstObjR(t_list **begin);
 void    displayLstObjS(t_list **begin);
 uint16_t    readHalf(uint16_t data, int opt);
+uint32_t    readWord(uint32_t data, int opt);
+int32_t    readSWord(int32_t data, int opt);
+uint64_t    readXWord(uint64_t data, int opt);
+int64_t    readXSWord(int64_t data, int opt);
 
 #endif //FT_NM_H
