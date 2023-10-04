@@ -19,19 +19,19 @@ char    put_symbol64(const Elf64_Sym *symtab)
 	return ('?');
 }
 
-void printDymSym(const Elf64_Sym *dynsym, uint64_t dynsym_size, char *dynstr, char *symname)
+void printDymSym64(const Elf64_Sym *dynsym, uint64_t dynsym_size, char *dynstr, char *symname)
 {
 	ft_printf ("\n# .dynsym entries:\n");
 	for (uint64_t i = 0; i < (dynsym_size / sizeof(Elf64_Sym)); i++)
 	{
 		if (dynsym[i].st_value == 0)
 		{
-			ft_printf("%s ", NULL_PAD);
+			ft_printf("%s ", NULL_PAD16);
 		}
 		else
 		{
-			char    buffer[16] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};;
-			hex(buffer, dynsym[i].st_value);
+			char    buffer[17] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0};
+			hex(buffer, dynsym[i].st_value, 0, B64);
 			ft_printf("%s ", buffer);
 		}
 		symname = &dynstr[dynsym[i].st_name];
@@ -102,13 +102,13 @@ void    parseSymbols64(t_file *file, uint8_t *map)
 		}
 	}
 	// TODO: remove printDymSym
-	printDymSym(dynsym, dynsym_size, dynstr, symname);
+	printDymSym64(dynsym, dynsym_size, dynstr, symname);
 	ft_printf ("\n# .symtab entries:\n");
 	for (uint64_t i = 0; i < (symtab_size / sizeof(Elf64_Sym)); i++)
 	{
 		if (symtab[i].st_value == '\x00')
 		{
-			value = ft_strdup(NULL_PAD);
+			value = ft_strdup(NULL_PAD16);
 			if (!value)
 			{
 				file->hdr_opt |= ERROR;
@@ -119,7 +119,7 @@ void    parseSymbols64(t_file *file, uint8_t *map)
 		else
 		{
 			char    buffer[17] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0};
-			hex(buffer, symtab[i].st_value);
+			hex(buffer, symtab[i].st_value, 0, B64);
 			value = ft_strdup(buffer);
 			if (!value)
 			{

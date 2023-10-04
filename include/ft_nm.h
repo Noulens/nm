@@ -28,7 +28,8 @@
 #define SPACE "                                                    "
 #define SPACE_PHDR "            "
 #define ZERO_PAD "0000000000000000"
-#define NULL_PAD "                "
+#define NULL_PAD16 "                "
+#define NULL_PAD8 "        "
 #define PADDING_EHDR 52
 #define PADDING_SHT 30
 #define PADDING_PHDR 13
@@ -47,7 +48,7 @@ void    printPhdr32(t_file *file, uint8_t *map);
 void    printPhdr64(t_file *file, uint8_t *map);
 void    parseSymbols64(t_file *file, uint8_t *map);
 void    parseSymbols32(t_file *file, uint8_t *map);
-void    hex(char *str, unsigned long nbr);
+void    hex(char *str, uint64_t nbr64, uint32_t nbr32, int opt);
 void    displayLstObj(t_list **begin);
 void    displayLstObjR(t_list **begin);
 void    displayLstObjS(t_list **begin);
