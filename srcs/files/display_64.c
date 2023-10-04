@@ -6,15 +6,19 @@
 
 char    put_symbol64(const Elf64_Sym *symtab)
 {
-	switch (symtab->st_info)
+	if (symtab->st_info == STT_FILE)
+		return ('a');
+	else if (symtab->st_info == STB_LOCAL)
 	{
-		case STT_FUNC:
-			if ((symtab->st_info & STB_LOCAL))
-				return ('t');
-			else
-				return ('T');
-		case STT_FILE:
-			return ('a');
+		return ('t');
+	}
+	else if (symtab->st_info == STB_GLOBAL)
+	{
+		return ('T');
+	}
+	else if (symtab->st_info == STB_GNU_UNIQUE)
+	{
+		return ('u');
 	}
 	return ('?');
 }
@@ -45,8 +49,8 @@ void printDymSym64(const Elf64_Sym *dynsym, uint64_t dynsym_size, char *dynstr, 
 void    parseSymbols64(t_file *file, uint8_t *map)
 {
 	Elf64_Ehdr      *ehdr = (Elf64_Ehdr *)map;
-	Elf64_Shdr      *sht = (Elf64_Shdr *)&map[ehdr->e_shoff];
-	const uint8_t   *shstrtab = &map[sht[ehdr->e_shstrndx].sh_offset];
+	Elf64_Shdr      *sht = (Elf64_Shdr *)&map[readXWord(ehdr->e_shoff, file->hdr_opt)];
+	const uint8_t   *shstrtab = &map[readXWord(sht[readHalf(ehdr->e_shstrndx, file->hdr_opt)].sh_offset, file->hdr_opt)];
 	Elf64_Sym       *symtab = NULL;
 	uint64_t        symtab_size = 0;
 	char            *symstr = NULL;
