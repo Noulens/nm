@@ -86,6 +86,16 @@ void printDymSym64(const Elf64_Sym *dynsym, uint64_t dynsym_size, char *dynstr, 
 	}
 }
 
+const uint8_t   *get_name_from_symbol(Elf64_Shdr *sht, const uint8_t *shstrtab, const Elf64_Sym *symtab, uint64_t i, int opt)
+{
+	size_t symbol_index = i;
+	Elf64_Half section_index = readHalf(symtab[symbol_index].st_shndx, opt);
+	Elf64_Shdr *section_header = &sht[section_index];
+	const uint8_t *sect_name = &shstrtab[readWord(section_header->sh_name, opt)];
+
+	return (sect_name);
+}
+
 void    parseSymbols64(t_file *file, uint8_t *map)
 {
 	int             opt = file->hdr_opt;
