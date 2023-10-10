@@ -137,6 +137,7 @@ static void  check_magic(t_file *file, uint8_t *map)
 			break ;
 		default:
 			file->hdr_opt |= ERROR;
+			return ;
 	}
 	if (ft_strncmp((char *)map, ELFMAG, 4) == 0)
 	{

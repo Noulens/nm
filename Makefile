@@ -106,4 +106,4 @@ re:				fclean
 				@$(MAKE) -s all
 
 change:
-	 			$(CC) $(CFLAGS) -m32 ./test/changedata.c -o change_byte
+	 			$(CC) $(CFLAGS) -m32 ./test/changedata.c -o change_byte -g

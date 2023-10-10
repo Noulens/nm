@@ -116,8 +116,8 @@ void    printEhdr32(const t_file *file, const uint8_t *map)
 	ft_printf("%s ", "e_entry (Entry point virtual address):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_entry (Entry point virtual address):"));
 	ft_printf("0x%X\n", readWord((unsigned long)ehdr32->e_entry, file->hdr_opt));
-	ft_printf("%s ", "e_entry (Entry point virtual address):");
-	write(1, SPACE, PADDING_EHDR - ft_strlen("e_entry (Entry point virtual address):"));
+	ft_printf("%s ", "e_phoff (Program header table file offset):");
+	write(1, SPACE, PADDING_EHDR - ft_strlen("e_phoff (Program header table file offset):"));
 	ft_printf("%ld\n", readWord((unsigned long)ehdr32->e_phoff, file->hdr_opt));
 	ft_printf("%s ", "e_shoff (Section header table file offset):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_shoff (Section header table file offset):"));
@@ -326,8 +326,8 @@ void    printEhdr64(t_file *file, const uint8_t *map)
 	ft_printf("%s ", "e_entry (Entry point virtual address):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_entry (Entry point virtual address):"));
 	ft_printf("0x%X\n", readWord((unsigned long)ehdr64->e_entry, file->hdr_opt));
-	ft_printf("%s ", "e_entry (Entry point virtual address):");
-	write(1, SPACE, PADDING_EHDR - ft_strlen("e_entry (Entry point virtual address):"));
+	ft_printf("%s ", "e_phoff (Program header table file offset):");
+	write(1, SPACE, PADDING_EHDR - ft_strlen("e_phoff (Program header table file offset):"));
 	ft_printf("%ld\n", readWord((unsigned long)ehdr64->e_phoff, file->hdr_opt));
 	ft_printf("%s ", "e_shoff (Section header table file offset):");
 	write(1, SPACE, PADDING_EHDR - ft_strlen("e_shoff (Section header table file offset):"));
