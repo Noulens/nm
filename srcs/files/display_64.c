@@ -18,7 +18,12 @@ char    put_symbol64(const Elf64_Sym *symtab, const Elf64_Shdr *sht, int opt)
 	else if (readHalf(symtab->st_shndx, opt) == SHN_UNDEF)
 		ret = 'U';
 	else if (readHalf(symtab->st_shndx, opt) == SHN_ABS)
-		ret = 'A';
+	{
+		if (ELF64_ST_BIND(c) == STB_LOCAL)
+			ret = 'a';
+		else
+			ret = 'A';
+	}
 	else if (readHalf(symtab->st_shndx, opt) == SHN_COMMON)
 		ret = 'C';
 	else if (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_type, opt) == SHT_NOBITS
@@ -150,6 +155,10 @@ void    parseSymbols64(t_file *file, uint8_t *map)
 		{
 			continue ;
 		}
+		if (c == 'a' && !(opt & A))
+			continue ;
+		if (c == 'U' && symstr[readWord(symtab[i].st_name, opt)] == '\x00')
+			continue ;
 		if (readXWord(symtab[i].st_value, opt) == '\x00')
 		{
 			value = ft_strdup(NULL_PAD16);
@@ -180,10 +189,7 @@ void    parseSymbols64(t_file *file, uint8_t *map)
 			return ;
 		}
 		type[0] = c;
-		if (symstr[readWord(symtab[i].st_name, opt)] == '\x00')
-			symname = ft_strdup("NULL");
-		else
-			symname = ft_strdup(&symstr[readWord(symtab[i].st_name, opt)]);
+		symname = ft_strdup(&symstr[readWord(symtab[i].st_name, opt)]);
 		if (!symname)
 		{
 			file->hdr_opt |= ERROR;
