@@ -4,6 +4,31 @@
 
 #include "ft_nm.h"
 
+int skip_strcmp(const char *s1, const char *s2)
+{
+	if (s1 == NULL && s2 == NULL)
+		return (0);
+	else if ((s1 == NULL && s2) || (s1 && s2 == NULL))
+		return (-1);
+	else
+	{
+		while (*s1 == '_')
+		{
+			s1++;
+		}
+		while (*s2 == '_')
+		{
+			s2++;
+		}
+		while (ft_tolower(*s1) && (ft_tolower(*s1) == ft_tolower(*s2)))
+		{
+			++s1;
+			++s2;
+		}
+		return (ft_tolower(*(unsigned char *)s1) - ft_tolower(*(unsigned char *)s2));
+	}
+}
+
 static void lstsort(t_list **begin_list, int (*cmp)(const char *, const char *))
 {
 	t_list	*ptr;
@@ -72,7 +97,7 @@ void    displayLstObj(t_list **begin)
 
 static int  cmpR(const char *s1, const char *s2)
 {
-	int res = ft_strcmp(s1, s2);
+	int res = skip_strcmp(s1, s2);
 	if (res > 0)
 		return (-1);
 	else if (res < 0)
@@ -89,7 +114,7 @@ void    displayLstObjR(t_list **begin)
 
 void    displayLstObjS(t_list **begin)
 {
-	lstsort(begin, ft_strcmp);
+	lstsort(begin, skip_strcmp);
 	displayLstObj(begin);
 }
 
