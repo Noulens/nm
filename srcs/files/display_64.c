@@ -51,6 +51,15 @@ char	put_symbol64(const Elf64_Sym *symtab, const Elf64_Shdr *sht, int opt)
 		else
 			ret = 'D';
 	}
+	else if (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_type, opt) == SHT_PROGBITS
+	         && ((readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) & SHF_ALLOC)
+			 && (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) & SHF_EXECINSTR)))
+	{
+		if (ELF64_ST_BIND(c) == STB_LOCAL)
+			ret = 't';
+		else
+			ret = 'T';
+	}
 	else if (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_type, opt) == SHT_NOTE
 			&& (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) & SHF_ALLOC))
 	{
@@ -58,14 +67,6 @@ char	put_symbol64(const Elf64_Sym *symtab, const Elf64_Shdr *sht, int opt)
 			ret = 'r';
 		else
 			ret = 'R';
-	}
-	else if (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_type, opt) == SHT_PROGBITS
-	         && readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) == (SHF_ALLOC | SHF_EXECINSTR))
-	{
-		if (ELF64_ST_BIND(c) == STB_LOCAL)
-			ret = 't';
-		else
-			ret = 'T';
 	}
 	else if (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_type, opt) == SHT_PROGBITS
 	         && (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) & SHF_ALLOC))
@@ -119,14 +120,15 @@ void printDymSym64(const Elf64_Sym *dynsym, uint64_t dynsym_size, char *dynstr, 
 	}
 }
 
-const uint8_t   *nameFromSymbol64(Elf64_Shdr *sht, const uint8_t *shstrtab, const Elf64_Sym *symtab, uint64_t i, int opt)
+const char   *nameFromSymbol64(Elf64_Shdr *sht, const uint8_t *shstrtab, const Elf64_Sym *symtab, uint64_t i, int opt)
 {
+
 	size_t symbol_index = i;
 	Elf64_Half section_index = readHalf(symtab[symbol_index].st_shndx, opt);
 	Elf64_Shdr *section_header = &sht[section_index];
 	const uint8_t *sect_name = &shstrtab[readWord(section_header->sh_name, opt)];
 
-	return (sect_name);
+	return ((const char *)sect_name);
 }
 
 void	parseSymbols64(t_file *file, uint8_t *map)
@@ -145,52 +147,52 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 	char			*type = NULL;
 	char			*symname = NULL;
 
-	ft_printf("Sections containing symbols:\n");
+//	ft_printf("Sections containing symbols:\n");
 	for (size_t i = 0; i < readHalf(ehdr->e_shnum, opt); i++)
 	{
 		const uint8_t *section_name = &shstrtab[readWord(sht[i].sh_name, opt)];
 		if (!ft_strncmp(".dynsym", (const char *) section_name, 7)
 		    && readWord(sht[i].sh_type, opt) == SHT_DYNSYM)
 		{
-			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
+//			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
 			dynsym = (Elf64_Sym *) &map[readXWord(sht[i].sh_offset, opt)];
 			dynsym_size = readXWord(sht[i].sh_size, opt);
 		}
 		else if (!ft_strncmp(".dynstr", (const char *) section_name, 7)
 		         && readWord(sht[i].sh_type, opt) == SHT_STRTAB)
 		{
-			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
+//			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
 			dynstr = (char *) &map[readXWord(sht[i].sh_offset, opt)];
 		}
 		else if (!ft_strncmp(".symtab", (const char *) section_name, 7)
 		         && readWord(sht[i].sh_type, opt) == SHT_SYMTAB)
 		{
-			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
+//			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
 			symtab = (Elf64_Sym *) &map[readXWord(sht[i].sh_offset, opt)];
 			symtab_size = readXWord(sht[i].sh_size, opt);
 		}
 		else if (!ft_strncmp(".strtab", (const char *) section_name, 7)
 		         && readWord(sht[i].sh_type, opt) == SHT_STRTAB)
 		{
-			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
+//			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
 			symstr = (char *) &map[readXWord(sht[i].sh_offset, opt)];
 		}
-		else if ((file->hdr_opt & A)
-		         && ft_strnstr((const char *) section_name, "debug", ft_strlen((const char *) section_name)))
-		{
-			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
-		}
-		else if ((file->hdr_opt & A)
-		         && ft_strnstr((const char *) section_name, "dbg", ft_strlen((const char *) section_name)))
-		{
-			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
-		}
+//		else if ((file->hdr_opt & A)
+//		         && ft_strnstr((const char *) section_name, "debug", ft_strlen((const char *) section_name)))
+//		{
+//			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
+//		}
+//		else if ((file->hdr_opt & A)
+//		         && ft_strnstr((const char *) section_name, "dbg", ft_strlen((const char *) section_name)))
+//		{
+//			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
+//		}
 	}
 	(void)dynsym_size;
 	(void)dynsym;
 	(void)dynstr;
 //	printDymSym64(dynsym, dynsym_size, dynstr, symname, opt);
-	ft_printf ("\n# .symtab entries:\n");
+//	ft_printf ("\n# .symtab entries:\n");
 	for (uint64_t i = 0; i < (symtab_size / sizeof(Elf64_Sym)); i++)
 	{
 		char c = put_symbol64(&symtab[i], sht, opt);
@@ -198,7 +200,7 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 		{
 			continue ;
 		}
-		if (c == 'a' && !(opt & A))
+		if ((c == 'a' || c == 'N') && !(opt & A))
 			continue ;
 		if (c == 'U' && symstr[readWord(symtab[i].st_name, opt)] == '\x00')
 			continue ;
@@ -232,7 +234,7 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 			return ;
 		}
 		type[0] = c;
-		if (c == 'N' && !ft_strlen(&symstr[readWord(symtab[i].st_name, opt)]))
+		if (!ft_strlen(&symstr[readWord(symtab[i].st_name, opt)]))
 			symname = ft_strdup((const char *)nameFromSymbol64(sht, shstrtab, symtab, i, opt));
 		else
 			symname = ft_strdup(&symstr[readWord(symtab[i].st_name, opt)]);
@@ -243,14 +245,10 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 			return ;
 		}
 		//TODO: remove this:
-		if (ft_strcmp(".debug_line_str", symname) == 0)
-		{
-			ft_printf("HERE .debug_line_str: %s\n", nameFromSymbol64(sht, shstrtab, symtab, i, opt));
-		}
-		else if (ft_strcmp(".debug_str", symname) == 0)
-		{
-			ft_printf("HERE .debug_str: %s\n", nameFromSymbol64(sht, shstrtab, symtab, i, opt));
-		}
+//		if (ft_strcmp("_ZNSt6vectorINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESaIS5_EED5Ev", symname) == 0)
+//		{
+//			ft_printf("HERE _ZNSt6vectorINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESaIS5_EED5Ev: %s\n", nameFromSymbol64(sht, shstrtab, symtab, i, opt));
+//		}
 
 		add_node_obj(file, value, type, symname);
 		if (file->hdr_opt & ERROR)
