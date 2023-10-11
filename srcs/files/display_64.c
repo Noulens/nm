@@ -124,13 +124,25 @@ void printDymSym64(const Elf64_Sym *dynsym, uint64_t dynsym_size, char *dynstr, 
 	}
 }
 
-const char   *nameFromSymbol64(Elf64_Shdr *sht, const uint8_t *shstrtab, const Elf64_Sym *symtab, uint64_t i, int opt)
+const char *nameFromSymbol64(Elf64_Ehdr *ehdr, Elf64_Shdr *sht, const uint8_t *shstrtab, const Elf64_Sym *symtab, uint64_t i, int opt)
 {
 	Elf64_Section   section_index = readHalf(symtab[i].st_shndx, opt);
-	Elf64_Shdr      *section_header = &sht[section_index];
-	const uint8_t *sect_name = &shstrtab[readWord(section_header->sh_name, opt)];
-	return ((const char *)sect_name);
+	// Check if the section index is valid
+	if (section_index < readHalf(ehdr->e_shnum, opt))
+	{
+		Elf64_Shdr  *section_header = &sht[section_index];
+		// Check if the section name is not a null pointer
+		if (shstrtab != NULL)
+		{
+			const uint8_t *sect_name = &shstrtab[readWord(section_header->sh_name, opt)];
+			// Check if the section name is not a null-terminated string
+			if (sect_name != NULL && sect_name[0] != '\0')
+				return (const char *)sect_name;
+		}
+	}
+	return ("");
 }
+
 
 void	parseSymbols64(t_file *file, uint8_t *map)
 {
@@ -152,28 +164,28 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 	for (size_t i = 0; i < readHalf(ehdr->e_shnum, opt); i++)
 	{
 		const uint8_t *section_name = &shstrtab[readWord(sht[i].sh_name, opt)];
-		if (!ft_strncmp(".dynsym", (const char *) section_name, 7)
-		    && readWord(sht[i].sh_type, opt) == SHT_DYNSYM)
-		{
+//		if (!ft_strncmp(".dynsym", (const char *) section_name, 7)
+//		    && readWord(sht[i].sh_type, opt) == SHT_DYNSYM)
+//		{
 //			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
-			dynsym = (Elf64_Sym *) &map[readXWord(sht[i].sh_offset, opt)];
-			dynsym_size = readXWord(sht[i].sh_size, opt);
-		}
-		else if (!ft_strncmp(".dynstr", (const char *) section_name, 7)
-		         && readWord(sht[i].sh_type, opt) == SHT_STRTAB)
-		{
+//			dynsym = (Elf64_Sym *) &map[readXWord(sht[i].sh_offset, opt)];
+//			dynsym_size = readXWord(sht[i].sh_size, opt);
+//		}
+//		else if (!ft_strncmp(".dynstr", (const char *) section_name, 7)
+//		         && readWord(sht[i].sh_type, opt) == SHT_STRTAB)
+//		{
 //			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
-			dynstr = (char *) &map[readXWord(sht[i].sh_offset, opt)];
-		}
-		else if (!ft_strncmp(".symtab", (const char *) section_name, 7)
-		         && readWord(sht[i].sh_type, opt) == SHT_SYMTAB)
+//			dynstr = (char *) &map[readXWord(sht[i].sh_offset, opt)];
+//		}
+		if (!ft_strncmp(".symtab", (const char *) section_name, 7)
+			&& readWord(sht[i].sh_type, opt) == SHT_SYMTAB)
 		{
 //			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
 			symtab = (Elf64_Sym *) &map[readXWord(sht[i].sh_offset, opt)];
 			symtab_size = readXWord(sht[i].sh_size, opt);
 		}
 		else if (!ft_strncmp(".strtab", (const char *) section_name, 7)
-		         && readWord(sht[i].sh_type, opt) == SHT_STRTAB)
+			&& readWord(sht[i].sh_type, opt) == SHT_STRTAB)
 		{
 //			ft_printf("%s shdr @ 0x%x\n", section_name, readXWord(sht[i].sh_offset, opt));
 			symstr = (char *) &map[readXWord(sht[i].sh_offset, opt)];
@@ -201,10 +213,10 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 		{
 			continue ;
 		}
-		if ((opt & G) && (c < 'Aq' || (c > 'I' && c < 'U') || (c > 'U' && c < 'i') || (c > 'i' && c < 'v') || c > 'w'))
+/*		if ((opt & G) && (c < 'Aq' || (c > 'I' && c < 'U') || (c > 'U' && c < 'i') || (c > 'i' && c < 'v') || c > 'w'))
 		{
 			continue ;
-		}
+		}*/
 		if ((c == 'a' || c == 'N') && !(opt & A))
 			continue ;
 		if (c == 'U' && symstr[readWord(symtab[i].st_name, opt)] == '\x00')
@@ -239,8 +251,8 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 			return ;
 		}
 		type[0] = c;
-		if (c != 'a' && !ft_strlen(&symstr[readWord(symtab[i].st_name, opt)]))
-			symname = ft_strdup((const char *)nameFromSymbol64(sht, shstrtab, symtab, i, opt));
+		if (symstr[readWord(symtab[i].st_name, opt)] == '\x00')
+			symname = ft_strdup((const char *)nameFromSymbol64(ehdr, sht, shstrtab, symtab, i, opt));
 		else
 			symname = ft_strdup(&symstr[readWord(symtab[i].st_name, opt)]);
 		if (!symname)
