@@ -169,7 +169,7 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 			continue ;
 		if (c == 'U' && symstr[readWord(symtab[i].st_name, opt)] == '\x00')
 			continue ;
-		if (c == 'U' && readXWord(symtab[i].st_value, opt) == '\x00')
+		if ((c == 'U' || c == 'v' || c == 'w') && readXWord(symtab[i].st_value, opt) == '\x00')
 		{
 			value = ft_strdup(NULL_PAD16);
 			if (!value)
