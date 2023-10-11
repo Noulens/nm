@@ -70,7 +70,7 @@ void printDymSym32(const Elf32_Sym *dynsym, uint32_t dynsym_size, char *dynstr, 
 	{
 		if (readWord(dynsym[i].st_value, opt) == 0)
 		{
-			ft_printf("%s ", NULL_PAD16);
+			ft_printf("%s ", NULL_PAD8);
 		}
 		else
 		{
@@ -171,7 +171,7 @@ void	parseSymbols32(t_file *file, uint8_t *map)
 			continue ;
 		if (c == 'U' && readWord(symtab[i].st_value, opt) == '\x00')
 		{
-			value = ft_strdup(NULL_PAD16);
+			value = ft_strdup(NULL_PAD8);
 			if (!value)
 			{
 				file->hdr_opt |= ERROR;
