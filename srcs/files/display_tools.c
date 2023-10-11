@@ -12,9 +12,9 @@ int skip_strcmp(const char *s1, const char *s2)
 		return (-1);
 	else
 	{
-		while (*s1 == '_')
+		while (*s1 == '_' || *s1 == '.')
 			s1++;
-		while (*s2 == '_')
+		while (*s2 == '_' || *s2 == '.')
 			s2++;
 		while (ft_tolower(*s1) && (ft_tolower(*s1) == ft_tolower(*s2)))
 		{

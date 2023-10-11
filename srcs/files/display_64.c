@@ -42,6 +42,23 @@ char	put_symbol64(const Elf64_Sym *symtab, const Elf64_Shdr *sht, int opt)
 		else
 			ret = 'D';
 	}
+	else if (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_type, opt) == SHT_DYNAMIC
+			&& ((readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) & (SHF_ALLOC))
+			|| readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) == (SHF_ALLOC | SHF_WRITE)))
+	{
+		if (ELF64_ST_BIND(c) == STB_LOCAL)
+			ret = 'd';
+		else
+			ret = 'D';
+	}
+	else if (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_type, opt) == SHT_NOTE
+			&& (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) & SHF_ALLOC))
+	{
+		if (ELF64_ST_BIND(c) == STB_LOCAL)
+			ret = 'r';
+		else
+			ret = 'R';
+	}
 	else if (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_type, opt) == SHT_PROGBITS
 	         && readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) == (SHF_ALLOC | SHF_EXECINSTR))
 	{
@@ -51,12 +68,28 @@ char	put_symbol64(const Elf64_Sym *symtab, const Elf64_Shdr *sht, int opt)
 			ret = 'T';
 	}
 	else if (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_type, opt) == SHT_PROGBITS
-	         && readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) == SHF_ALLOC)
+	         && (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) & SHF_ALLOC))
 	{
 		if (ELF64_ST_BIND(c) == STB_LOCAL)
 			ret = 'r';
 		else
 			ret = 'R';
+	}
+	else if (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_type, opt) == SHT_PROGBITS
+	         && (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) == 0
+			 || (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) & SHF_MERGE)))
+	{
+		ret = 'N';
+	}
+	else if ((readWord(sht[readHalf(symtab->st_shndx, opt)].sh_type, opt) == SHT_INIT_ARRAY
+			&& readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) == (SHF_WRITE | SHF_ALLOC))
+			|| (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_type, opt) == SHT_FINI_ARRAY
+			&& readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) == (SHF_WRITE | SHF_ALLOC)))
+	{
+		if (ELF64_ST_BIND(c) == STB_LOCAL)
+			ret = 'd';
+		else
+			ret = 'D';
 	}
 	else
 		ret = '?';
@@ -199,25 +232,26 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 			return ;
 		}
 		type[0] = c;
-		symname = ft_strdup(&symstr[readWord(symtab[i].st_name, opt)]);
+		if (c == 'N' && !ft_strlen(&symstr[readWord(symtab[i].st_name, opt)]))
+			symname = ft_strdup((const char *)nameFromSymbol64(sht, shstrtab, symtab, i, opt));
+		else
+			symname = ft_strdup(&symstr[readWord(symtab[i].st_name, opt)]);
 		if (!symname)
 		{
 			file->hdr_opt |= ERROR;
 			ft_fprintf(2, "ft_nm: parseSymbols64: %s", strerror(errno));
 			return ;
 		}
-		if (ft_strcmp("__do_global_dtors_aux_fini_array_entry", symname) == 0)
+		//TODO: remove this:
+		if (ft_strcmp(".debug_line_str", symname) == 0)
 		{
-			ft_printf("HERE: %s\n", nameFromSymbol64(sht, shstrtab, symtab, i, opt));
+			ft_printf("HERE .debug_line_str: %s\n", nameFromSymbol64(sht, shstrtab, symtab, i, opt));
 		}
-		else if (ft_strcmp("_DYNAMIC", symname) == 0)
+		else if (ft_strcmp(".debug_str", symname) == 0)
 		{
-			ft_printf("HERE: %s\n", nameFromSymbol64(sht, shstrtab, symtab, i, opt));
+			ft_printf("HERE .debug_str: %s\n", nameFromSymbol64(sht, shstrtab, symtab, i, opt));
 		}
-		else if (ft_strcmp("__frame_dummy_init_array_entry", symname) == 0)
-		{
-			ft_printf("HERE: %s\n", nameFromSymbol64(sht, shstrtab, symtab, i, opt));
-		}
+
 		add_node_obj(file, value, type, symname);
 		if (file->hdr_opt & ERROR)
 		{
