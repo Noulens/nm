@@ -410,7 +410,7 @@ void    printSht64(const t_file *file, const uint8_t *map)
 				break;
 			case SHT_RELA:		ft_printf("RELA");
 				break;
-			case SHT_GNU_HASH:  ft_printf("GNU HASH");
+			case SHT_HASH:		ft_printf("SHT_HASH");
 				break;
 			case SHT_DYNAMIC:   ft_printf("DYNAMIC");
 				break;
@@ -424,6 +424,14 @@ void    printSht64(const t_file *file, const uint8_t *map)
 				break;
 			case SHT_DYNSYM:    ft_printf("DYNSYM");
 				break;
+			case SHT_INIT_ARRAY:   ft_printf("INIT_ARR.");
+				break;
+			case SHT_FINI_ARRAY:   ft_printf("FINI_ARR.");
+				break;
+			case SHT_PREINIT_ARRAY: ft_printf("SHT_PREI.");
+				break ;
+			case SHT_GROUP: ft_printf("GROUP");
+				break ;
 			case SHT_LOPROC:    ft_printf("LOPROC");
 				break;
 			case SHT_HIPROC:    ft_printf("HIPROC");
@@ -434,11 +442,9 @@ void    printSht64(const t_file *file, const uint8_t *map)
 				break;
 			case SHT_GNU_verneed:   ft_printf("VERNEED");
 				break;
-			case SHT_INIT_ARRAY:   ft_printf("INIT_ARR.");
-				break;
-			case SHT_FINI_ARRAY:   ft_printf("FINI_ARR.");
-				break;
 			case SHT_GNU_versym:   ft_printf("VERSYM");
+				break;
+			case SHT_GNU_HASH:  ft_printf("GNU HASH");
 				break;
 			default:			ft_printf("Unknown");
 				break;

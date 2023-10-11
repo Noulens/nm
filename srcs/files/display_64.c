@@ -92,6 +92,10 @@ char	put_symbol64(const Elf64_Sym *symtab, const Elf64_Shdr *sht, int opt)
 		else
 			ret = 'D';
 	}
+	else if (ELF64_ST_TYPE(c) == STT_NOTYPE)
+	{
+		ret = 'n';
+	}
 	else
 		ret = '?';
 	return (ret);
@@ -122,12 +126,9 @@ void printDymSym64(const Elf64_Sym *dynsym, uint64_t dynsym_size, char *dynstr, 
 
 const char   *nameFromSymbol64(Elf64_Shdr *sht, const uint8_t *shstrtab, const Elf64_Sym *symtab, uint64_t i, int opt)
 {
-
-	size_t symbol_index = i;
-	Elf64_Half section_index = readHalf(symtab[symbol_index].st_shndx, opt);
-	Elf64_Shdr *section_header = &sht[section_index];
+	Elf64_Section   section_index = readHalf(symtab[i].st_shndx, opt);
+	Elf64_Shdr      *section_header = &sht[section_index];
 	const uint8_t *sect_name = &shstrtab[readWord(section_header->sh_name, opt)];
-
 	return ((const char *)sect_name);
 }
 
@@ -200,6 +201,10 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 		{
 			continue ;
 		}
+		if ((opt & G) && (c < 'Aq' || (c > 'I' && c < 'U') || (c > 'U' && c < 'i') || (c > 'i' && c < 'v') || c > 'w'))
+		{
+			continue ;
+		}
 		if ((c == 'a' || c == 'N') && !(opt & A))
 			continue ;
 		if (c == 'U' && symstr[readWord(symtab[i].st_name, opt)] == '\x00')
@@ -234,7 +239,7 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 			return ;
 		}
 		type[0] = c;
-		if (!ft_strlen(&symstr[readWord(symtab[i].st_name, opt)]))
+		if (c != 'a' && !ft_strlen(&symstr[readWord(symtab[i].st_name, opt)]))
 			symname = ft_strdup((const char *)nameFromSymbol64(sht, shstrtab, symtab, i, opt));
 		else
 			symname = ft_strdup(&symstr[readWord(symtab[i].st_name, opt)]);
@@ -244,12 +249,6 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 			ft_fprintf(2, "ft_nm: parseSymbols64: %s", strerror(errno));
 			return ;
 		}
-		//TODO: remove this:
-//		if (ft_strcmp("_ZNSt6vectorINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESaIS5_EED5Ev", symname) == 0)
-//		{
-//			ft_printf("HERE _ZNSt6vectorINSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEESaIS5_EED5Ev: %s\n", nameFromSymbol64(sht, shstrtab, symtab, i, opt));
-//		}
-
 		add_node_obj(file, value, type, symname);
 		if (file->hdr_opt & ERROR)
 		{
@@ -259,7 +258,7 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 	}
 	if (!ft_lstsize(file->objlst))
 		ft_fprintf(2,"ft_nm: %s: no symbols\n", file->path);
-	else if (file->hdr_opt & P)
+	if (file->hdr_opt & P)
 		displayLstObj(&file->objlst);
 	else if (file->hdr_opt & R)
 		displayLstObjR(&file->objlst);
