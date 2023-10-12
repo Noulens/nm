@@ -6,6 +6,8 @@
 
 int skip_strcmp(const char *s1, const char *s2)
 {
+	char    *tmp1 = (char *)s1;
+	char    *tmp2 = (char *)s2;
 	if (s1 == NULL && s2 == NULL)
 		return (0);
 	else if ((s1 == NULL && s2) || (s1 && s2 == NULL))
@@ -29,6 +31,8 @@ int skip_strcmp(const char *s1, const char *s2)
 				while (*s2 == '_' || *s2 == '.' || *s2 == '-' || *s2 == '@')
 					s2++;
 		}
+		if (ft_tolower(*(unsigned char *)s1) - ft_tolower(*(unsigned char *)s2) == 0)
+			return (ft_strcmp(tmp1, tmp2));
 		return (ft_tolower(*(unsigned char *)s1) - ft_tolower(*(unsigned char *)s2));
 	}
 }
