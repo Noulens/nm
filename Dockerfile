@@ -11,15 +11,15 @@ RUN	        apt update && \
             gcc \
             gcc-multilib \
             gdb \
-            valgrind \
+            valgrind
 
-COPY        ./run.sh .
+COPY        run.sh .
 
 RUN	        chmod +x ./run.sh && mkdir ft_nm
 
 WORKDIR     ./ft_nm
 
-COPY        ./code .
+COPY        code .
 
 RUN	        make
 
