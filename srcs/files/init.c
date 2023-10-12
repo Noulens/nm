@@ -73,7 +73,7 @@ void    check_args(int ac, char **av, t_args *args)
 	len = ft_ptrlen((const char **) av);
 	while (len--)
 	{
-        if (!ft_strncmp(*av, "--verbose", 10))
+        if (!ft_strcmp(*av, "--verbose"))
         {
             args->flags |= V;
         }

@@ -232,6 +232,7 @@ static void mapping(t_file *file, struct stat *sb, uint8_t **map)
 
 void    proceed(t_args *args)
 {
+	int         f = args->fds;
 	t_list      *tmp = args->fl;
 	t_file      *file = NULL;
 	uint8_t     *map = NULL;
@@ -258,7 +259,9 @@ void    proceed(t_args *args)
 			ft_fprintf(STDERR_FILENO, SYS_ERR"\n", file->path, strerror(errno));
 		}
 		if (!(file->hdr_opt & ERROR))
-			ft_putchar_fd(1, '\n');
+		{
+			f-- > 1 ? ft_putchar_fd('\n', 1) : 0;
+		}
 		else
 			args->exit = 1;
 		tmp = tmp->next;

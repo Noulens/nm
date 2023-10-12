@@ -10,6 +10,16 @@ int isUndefined(uint8_t c)
 		|| (c > 'i' && c < 'v') || c > 'w');
 }
 
+int isDebug(uint8_t c)
+{
+	return (c == 'N' || c == 'n' || c == 'a');
+}
+
+int isNoAddress(uint8_t c)
+{
+	return (c == 'U' || c == 'v' || c == 'w');
+}
+
 int isGlobal(uint8_t c)
 {
 	return (c == 'U' || c == 'v' || c == 'w' || c == 'V'

@@ -17,7 +17,7 @@ SRCS		=	$(addprefix srcs/,						\
 										init.c			\
 										display_32.c	\
 										display_64.c	\
-										conversion.c	\
+										tools.c			\
 										display_tools.c	\
 										read_data.c		\
 										)				\

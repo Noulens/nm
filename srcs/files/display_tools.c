@@ -12,9 +12,9 @@ int skip_strcmp(const char *s1, const char *s2)
 		return (-1);
 	else
 	{
-		while (*s1 == '_' || *s1 == '.')
+		while (*s1 == '_' || *s1 == '.' || *s1 == '-' || *s1 == '@')
 			s1++;
-		while (*s2 == '_' || *s2 == '.')
+		while (*s2 == '_' || *s2 == '.' || *s2 == '-' || *s2 == '@')
 			s2++;
 		while (ft_tolower(*s1) && (ft_tolower(*s1) == ft_tolower(*s2)))
 		{
@@ -22,11 +22,11 @@ int skip_strcmp(const char *s1, const char *s2)
 				++s1;
 				++s2;
 			}
-			if ((*s1 == '_' || *s1 == '.'))
-				while (*s1 == '_' || *s1 == '.')
+			if ((*s1 == '_' || *s1 == '.' || *s1 == '-' || *s1 == '@'))
+				while (*s1 == '_' || *s1 == '.' || *s1 == '-' || *s1 == '@')
 					s1++;
-			if (*s2 == '_' || *s2 == '.')
-				while (*s2 == '_' || *s2 == '.')
+			if (*s2 == '_' || *s2 == '.' || *s2 == '-' || *s2 == '@')
+				while (*s2 == '_' || *s2 == '.' || *s2 == '-' || *s2 == '@')
 					s2++;
 		}
 		return (ft_tolower(*(unsigned char *)s1) - ft_tolower(*(unsigned char *)s2));
@@ -546,4 +546,27 @@ void    printPhdr64(t_file *file, uint8_t *map)
 		ft_putchar_fd('\n', 1);
 	}
 	ft_putchar_fd('\n', 1);
+}
+
+void    printDymSym64(const Elf64_Sym *dynsym, uint64_t dynsym_size, char *dynstr, char *symname, const int opt)
+{
+	ft_printf ("\n# .dynsym entries:\n");
+	for (uint64_t i = 0; i < (dynsym_size / sizeof(Elf64_Sym)); i++)
+	{
+		if (readXWord(dynsym[i].st_value, opt) == 0)
+		{
+			ft_printf("%s ", NULL_PAD16);
+		}
+		else
+		{
+			char	buffer[17] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0};
+			hex(buffer, readXWord(dynsym[i].st_value, opt), 0, B64);
+			ft_printf("%s ", buffer);
+		}
+		symname = &dynstr[readWord(dynsym[i].st_name, opt)];
+		if (*symname == '\x00')
+			ft_printf("NULL\n");
+		else
+			ft_printf("%s\n", symname);
+	}
 }
