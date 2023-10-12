@@ -4,6 +4,20 @@
 
 #include "ft_nm.h"
 
+int isUndefined(uint8_t c)
+{
+	return (c < 'I' || (c > 'I' && c < 'U') || (c > 'U' && c < 'i')
+		|| (c > 'i' && c < 'v') || c > 'w');
+}
+
+int isGlobal(uint8_t c)
+{
+	return (c == 'U' || c == 'v' || c == 'w' || c == 'V'
+		|| c == 'W' || c == 'B' || c == 'C' || c =='D'
+		|| c == 'R' || c == 'T' || c == 'A' || c == 'G'
+		|| c == 'N' || c == 'R' || c == 'u');
+}
+
 const char  *nameFromSymbol64(Elf64_Ehdr *ehdr, Elf64_Shdr *sht, const uint8_t *shstrtab, const Elf64_Sym *symtab, uint64_t i, int opt)
 {
 	Elf64_Section   section_index = readHalf(symtab[i].st_shndx, opt);

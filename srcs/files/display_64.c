@@ -194,11 +194,11 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 			if (!ft_strncmp(".eh_frame", nameFromSymbol64(ehdr, sht, shstrtab,symtab, i, opt), 9))
 				c = 'p';
 		}
-		if ((opt & U) && (c < 'I' || (c > 'I' && c < 'U') || (c > 'U' && c < 'i') || (c > 'i' && c < 'v') || c > 'w'))
+		if ((opt & U) && isUndefined(c))
 		{
 			continue ;
 		}
-		if ((opt & G) && (c == 'U' || c == 'v' || c == 'w' || c == 'V' || c == 'W' || c == 'B' || c == 'C' || c =='D' || c == 'R' || c == 'T' || c == 'A' || c == 'G' || c == 'N' || c == 'R' || c == 'u'))
+		if ((opt & G) && isGlobal(c))
 		{
 			continue ;
 		}
