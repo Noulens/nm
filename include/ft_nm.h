@@ -53,6 +53,7 @@ void    displayLstObj(t_list **begin);
 void    displayLstObjR(t_list **begin);
 void    displayLstObjS(t_list **begin);
 void    printDymSym64(const Elf64_Sym *dynsym, uint64_t dynsym_size, char *dynstr, char *symname, int opt);
+void    printDymSym32(const Elf32_Sym *dynsym, uint32_t dynsym_size, char *dynstr, char *symname, int opt);
 const char *nameFromSymbol64(Elf64_Ehdr *ehdr, Elf64_Shdr *sht, const uint8_t *shstrtab, const Elf64_Sym *symtab, uint64_t i, int opt);
 const char *nameFromSymbol32(Elf32_Ehdr *ehdr, Elf32_Shdr *sht, const uint8_t *shstrtab, const Elf32_Sym *symtab, uint32_t i, int opt);
 int isGlobal(uint8_t c);

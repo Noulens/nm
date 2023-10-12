@@ -570,3 +570,25 @@ void    printDymSym64(const Elf64_Sym *dynsym, uint64_t dynsym_size, char *dynst
 			ft_printf("%s\n", symname);
 	}
 }
+
+void    printDymSym32(const Elf32_Sym *dynsym, uint32_t dynsym_size, char *dynstr, char *symname, const int opt)
+{
+	ft_printf("\n# .dynsym entries:\n");
+	for (uint32_t i = 0; i < (dynsym_size / sizeof(Elf32_Sym)); i++)
+	{
+		if (readWord(dynsym[i].st_value, opt) == 0)
+		{
+			ft_printf("%s ", NULL_PAD8);
+		} else
+		{
+			char buffer[9] = "\0\0\0\0\0\0\0\0\0";
+			hex(buffer, 0, readWord(dynsym[i].st_value, opt), B32);
+			ft_printf("%s ", buffer);
+		}
+		symname = &dynstr[readWord(dynsym[i].st_name, opt)];
+		if (*symname == '\x00')
+			ft_printf("NULL\n");
+		else
+			ft_printf("%s\n", symname);
+	}
+}
