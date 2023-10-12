@@ -124,26 +124,6 @@ void printDymSym64(const Elf64_Sym *dynsym, uint64_t dynsym_size, char *dynstr, 
 	}
 }
 
-const char *nameFromSymbol64(Elf64_Ehdr *ehdr, Elf64_Shdr *sht, const uint8_t *shstrtab, const Elf64_Sym *symtab, uint64_t i, int opt)
-{
-	Elf64_Section   section_index = readHalf(symtab[i].st_shndx, opt);
-	// Check if the section index is valid
-	if (section_index < readHalf(ehdr->e_shnum, opt))
-	{
-		Elf64_Shdr  *section_header = &sht[section_index];
-		// Check if the section name is not a null pointer
-		if (shstrtab != NULL)
-		{
-			const uint8_t *sect_name = &shstrtab[readWord(section_header->sh_name, opt)];
-			// Check if the section name is not a null-terminated string
-			if (sect_name != NULL && sect_name[0] != '\0')
-				return (const char *)sect_name;
-		}
-	}
-	return ("");
-}
-
-
 void	parseSymbols64(t_file *file, uint8_t *map)
 {
 	int				opt = file->hdr_opt;
@@ -209,14 +189,19 @@ void	parseSymbols64(t_file *file, uint8_t *map)
 	for (uint64_t i = 0; i < (symtab_size / sizeof(Elf64_Sym)); i++)
 	{
 		char c = put_symbol64(&symtab[i], sht, opt);
+		if (c== '?')
+		{
+			if (!ft_strncmp(".eh_frame", nameFromSymbol64(ehdr, sht, shstrtab,symtab, i, opt), 9))
+				c = 'p';
+		}
 		if ((opt & U) && (c < 'I' || (c > 'I' && c < 'U') || (c > 'U' && c < 'i') || (c > 'i' && c < 'v') || c > 'w'))
 		{
 			continue ;
 		}
-/*		if ((opt & G) && (c < 'Aq' || (c > 'I' && c < 'U') || (c > 'U' && c < 'i') || (c > 'i' && c < 'v') || c > 'w'))
+		if ((opt & G) && (c == 'U' || c == 'v' || c == 'w' || c == 'V' || c == 'W' || c == 'B' || c == 'C' || c =='D' || c == 'R' || c == 'T' || c == 'A' || c == 'G' || c == 'N' || c == 'R' || c == 'u'))
 		{
 			continue ;
-		}*/
+		}
 		if ((c == 'a' || c == 'N') && !(opt & A))
 			continue ;
 		if (c == 'U' && symstr[readWord(symtab[i].st_name, opt)] == '\x00')

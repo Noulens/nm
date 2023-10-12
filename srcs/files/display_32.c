@@ -86,16 +86,6 @@ void printDymSym32(const Elf32_Sym *dynsym, uint32_t dynsym_size, char *dynstr, 
 	}
 }
 
-const uint8_t   *nameFromSymbol32(Elf32_Shdr *sht, const uint8_t *shstrtab, const Elf32_Sym *symtab, uint32_t i, int opt)
-{
-	size_t symbol_index = i;
-	Elf32_Half section_index = readHalf(symtab[symbol_index].st_shndx, opt);
-	Elf32_Shdr *section_header = &sht[section_index];
-	const uint8_t *sect_name = &shstrtab[readWord(section_header->sh_name, opt)];
-
-	return (sect_name);
-}
-
 void	parseSymbols32(t_file *file, uint8_t *map)
 {
 	int				opt = file->hdr_opt;
@@ -205,18 +195,6 @@ void	parseSymbols32(t_file *file, uint8_t *map)
 			file->hdr_opt |= ERROR;
 			ft_fprintf(2, "ft_nm: parseSymbols32: %s", strerror(errno));
 			return ;
-		}
-		if (ft_strcmp("__do_global_dtors_aux_fini_array_entry", symname) == 0)
-		{
-			ft_printf("HERE: %s\n", nameFromSymbol32(sht, shstrtab, symtab, i, opt));
-		}
-		else if (ft_strcmp("_DYNAMIC", symname) == 0)
-		{
-			ft_printf("HERE: %s\n", nameFromSymbol32(sht, shstrtab, symtab, i, opt));
-		}
-		else if (ft_strcmp("__frame_dummy_init_array_entry", symname) == 0)
-		{
-			ft_printf("HERE: %s\n", nameFromSymbol32(sht, shstrtab, symtab, i, opt));
 		}
 		add_node_obj(file, value, type, symname);
 		if (file->hdr_opt & ERROR)

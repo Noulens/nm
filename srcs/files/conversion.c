@@ -4,6 +4,44 @@
 
 #include "ft_nm.h"
 
+const char  *nameFromSymbol64(Elf64_Ehdr *ehdr, Elf64_Shdr *sht, const uint8_t *shstrtab, const Elf64_Sym *symtab, uint64_t i, int opt)
+{
+	Elf64_Section   section_index = readHalf(symtab[i].st_shndx, opt);
+	// Check if the section index is valid
+	if (section_index < readHalf(ehdr->e_shnum, opt))
+	{
+		Elf64_Shdr  *section_header = &sht[section_index];
+		// Check if the section name is not a null pointer
+		if (shstrtab != NULL)
+		{
+			const uint8_t *sect_name = &shstrtab[readWord(section_header->sh_name, opt)];
+			// Check if the section name is not a null-terminated string
+			if (sect_name != NULL && sect_name[0] != '\0')
+				return (const char *)sect_name;
+		}
+	}
+	return ("");
+}
+
+const char  *nameFromSymbol32(Elf32_Ehdr *ehdr, Elf32_Shdr *sht, const uint8_t *shstrtab, const Elf32_Sym *symtab, uint32_t i, int opt)
+{
+	Elf32_Section   section_index = readHalf(symtab[i].st_shndx, opt);
+	// Check if the section index is valid
+	if (section_index < readHalf(ehdr->e_shnum, opt))
+	{
+		Elf32_Shdr  *section_header = &sht[section_index];
+		// Check if the section name is not a null pointer
+		if (shstrtab != NULL)
+		{
+			const uint8_t *sect_name = &shstrtab[readWord(section_header->sh_name, opt)];
+			// Check if the section name is not a null-terminated string
+			if (sect_name != NULL && sect_name[0] != '\0')
+				return (const char *)sect_name;
+		}
+	}
+	return ("");
+}
+
 static void	to_hex(unsigned long addr, char *digit, int i)
 {
 		digit[i] = (char)(addr % 16);
