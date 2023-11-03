@@ -27,7 +27,7 @@ char	put_symbol32(const Elf32_Sym *symtab, const Elf32_Shdr *sht, int opt)
 	else if (readHalf(symtab->st_shndx, opt) == SHN_COMMON)
 		ret = 'C';
 	else if (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_type, opt) == SHT_NOBITS
-	         && readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) == (SHF_ALLOC | SHF_WRITE))
+	         && (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) & (SHF_ALLOC | SHF_WRITE)) == (SHF_ALLOC | SHF_WRITE))
 	{
 		if (ELF32_ST_BIND(c) == STB_LOCAL)
 			ret = 'b';
@@ -35,7 +35,7 @@ char	put_symbol32(const Elf32_Sym *symtab, const Elf32_Shdr *sht, int opt)
 			ret = 'B';
 	}
 	else if (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_type, opt) == SHT_PROGBITS
-	         && readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) == (SHF_ALLOC | SHF_WRITE))
+	         && (readWord(sht[readHalf(symtab->st_shndx, opt)].sh_flags, opt) & (SHF_ALLOC | SHF_WRITE)) == (SHF_ALLOC | SHF_WRITE))
 	{
 		if (ELF32_ST_BIND(c) == STB_LOCAL)
 			ret = 'd';
