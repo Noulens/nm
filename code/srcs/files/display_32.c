@@ -196,6 +196,7 @@ void	parseSymbols32(t_file *file, uint8_t *map)
 		if (!type)
 			return (file->hdr_opt |= ERROR, ft_fprintf(2, "ft_nm: parseSymbols32: %s", strerror(errno)), (void)0);
 		type[0] = c;
+		// add code snippet here to get the section of unknown symbols
 		if (symstr[readWord(symtab[i].st_name, opt)] == '\x00')
 			symname = ft_strdup((const char *)nameFromSymbol32(ehdr, sht, shstrtab, symtab, i, opt));
 		else
@@ -238,4 +239,13 @@ void	parseSymbols32(t_file *file, uint8_t *map)
 			dynstr = (char *) &map[readXWord(sht[i].sh_offset, opt)];
 		}
 		printDymSym32(dynsym, dynsym_size, dynstr, symname, opt);
+*/
+
+/*
+ * Insert this code to get the section name of unknown objects
+ */
+/*		if (!ft_strncmp("SYMBOL_NAME", &symstr[readWord(symtab[i].st_name, opt)], SYMBOL_NAME_LEN))
+		{
+			ft_printf("SECTION: %s\n", nameFromSymbol32(ehdr, sht, shstrtab, symtab, i, opt));
+		}
 */
