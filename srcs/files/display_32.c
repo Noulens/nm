@@ -178,7 +178,7 @@ void	parseSymbols32(t_file *file, uint8_t *map)
 			&& (c == 'U' || (!(opt & A))))
 			continue ;
 		// Undefined symbols with no address have a blank padding
-		if (isNoAddress(c) && readXWord(symtab[i].st_value, opt) == '\x00')
+		if (c == 'U' || (isNoAddress(c) && readXWord(symtab[i].st_value, opt) == '\x00'))
 		{
 			value = ft_strdup(NULL_PAD8);
 			if (!value)
