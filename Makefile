@@ -74,7 +74,7 @@ BODY_WIDTH	=	$(shell printf "$$(($(HEAD_SIZE) - 1))")
 
 ##.SILENT:
 
-all:			change subsystem $(NAME)
+all:			subsystem $(NAME)
 
 subsystem: # Make the libft
 				@make -C $(LIBS) all
@@ -104,6 +104,3 @@ fclean:			clean
 
 re:				fclean
 				@$(MAKE) -s all
-
-change:
-	 			$(CC) $(CFLAGS) -m32 ./test/changedata.c -o change_byte -g
